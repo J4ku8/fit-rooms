@@ -18,11 +18,12 @@ pio.templates.default = "seaborn"
 df = px.data
 
 print(df.tips())
-
+labels = ['Oxygen','Hydrogen','Carbon_Dioxide','Nitrogen']
+values = [4500, 2500, 1053, 500]
 print(px.data.wind()['strength'].unique())
 
 scatter = go.Scatter(y=px.data.wind()['frequency'], mode="lines")
-pieChart = go.Pie(values=[2, 3, 1], hole=.3)
+pieChart = go.Pie(values=values, labels=labels, hole=.3)
 histogram = go.Histogram(x=df.tips()['day'])
 sankey = go.Sankey(
     arrangement="snap",
