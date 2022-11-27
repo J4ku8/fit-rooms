@@ -1,0 +1,160 @@
+{
+  "aliasColors": {},
+  "bars": true,
+  "dashLength": 10,
+  "dashes": false,
+  "datasource": "homedata",
+  "fill": 0,
+  "gridPos": {
+    "h": 9,
+    "w": 12,
+    "x": 0,
+    "y": 0
+  },
+  "hideTimeOverride": false,
+  "id": 2,
+  "legend": {
+    "alignAsTable": false,
+    "avg": false,
+    "current": false,
+    "max": false,
+    "min": false,
+    "rightSide": false,
+    "show": false,
+    "total": false,
+    "values": false
+  },
+  "lines": false,
+  "linewidth": 2,
+  "links": [],
+  "nullPointMode": "null",
+  "percentage": false,
+  "pointradius": 5,
+  "points": false,
+  "renderer": "flot",
+  "seriesOverrides": [
+    {
+      "alias": "weather.mean",
+      "color": "#e5ac0e"
+    }
+  ],
+  "spaceLength": 10,
+  "stack": false,
+  "steppedLine": false,
+  "targets": [
+    {
+      "groupBy": [
+        {
+          "params": [
+            "$__interval"
+          ],
+          "type": "time"
+        },
+        {
+          "params": [
+            "null"
+          ],
+          "type": "fill"
+        }
+      ],
+      "orderByTime": "ASC",
+      "policy": "default",
+      "query": "SELECT mean(\"temperature\") FROM \"weather\" WHERE time >= 1650281888485ms GROUP BY time(1d) fill(none)\n",
+      "rawQuery": true,
+      "refId": "A",
+      "resultFormat": "time_series",
+      "select": [
+        [
+          {
+            "params": [
+              "value"
+            ],
+            "type": "field"
+          },
+          {
+            "params": [],
+            "type": "mean"
+          }
+        ]
+      ],
+      "tags": [],
+      "hide": true
+    },
+    {
+      "refId": "B",
+      "policy": "default",
+      "resultFormat": "time_series",
+      "orderByTime": "ASC",
+      "tags": [],
+      "groupBy": [
+        {
+          "type": "time",
+          "params": [
+            "$__interval"
+          ]
+        },
+        {
+          "type": "fill",
+          "params": [
+            "null"
+          ]
+        }
+      ],
+      "select": [
+        [
+          {
+            "type": "field",
+            "params": [
+              "value"
+            ]
+          },
+          {
+            "type": "mean",
+            "params": []
+          }
+        ]
+      ],
+      "query": "SELECT * from weather",
+      "rawQuery": true
+    }
+  ],
+  "thresholds": [],
+  "timeFrom": null,
+  "timeShift": null,
+  "title": "Panel Title",
+  "tooltip": {
+    "shared": false,
+    "sort": 0,
+    "value_type": "individual"
+  },
+  "type": "graph",
+  "xaxis": {
+    "buckets": null,
+    "mode": "histogram",
+    "name": null,
+    "show": true,
+    "values": []
+  },
+  "yaxes": [
+    {
+      "format": "short",
+      "label": null,
+      "logBase": 1,
+      "max": "30",
+      "min": "-15",
+      "show": true
+    },
+    {
+      "format": "short",
+      "label": null,
+      "logBase": 1,
+      "max": null,
+      "min": null,
+      "show": false
+    }
+  ],
+  "yaxis": {
+    "align": false,
+    "alignLevel": null
+  }
+}
