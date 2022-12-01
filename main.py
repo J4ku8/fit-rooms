@@ -16,6 +16,7 @@ app = Dash(__name__)
 
 app.layout = html.Div([
     html.Br(),
+    # TODO: side menu with dropwodn and checkboxes
     dcc.Dropdown(uniqYears, uniqYears[0], id='year-dropdown'),
     dcc.Graph(id='graph-with-dropdown'),
     dcc.Graph(id='pie'),
