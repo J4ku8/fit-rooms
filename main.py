@@ -1,82 +1,85 @@
-from dash import Dash, dcc, html, Input, Output
-from plotly.subplots import make_subplots
+from datetime import datetime
 import plotly.graph_objects as go
+from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
-import plotly.io as pio
-import json, urllib
 
-# from influxdb_client import InfluxDBClient
-#
-# client = InfluxDBClient(host='https://10.38.5.125', port=4201, username='influx', password='influx2021', ssl=True, verify_ssl=True)
+import pandas as pd
+
+df = px.data.stocks()
+dates = px.data.stocks()["date"].items()
+dates_list = [datetime.strptime(date[1], '%Y-%m-%d').date() for date in dates]
+years = [date.year for date in dates_list]
+df["year"] = years
+uniqYears = list(dict.fromkeys([date.year for date in dates_list]))
 
 app = Dash(__name__)
 
-pio.renderers.default = "chrome"
-
-pio.templates.default = "seaborn"
-
-df = px.data
-
-print(df.tips())
-labels = ['Oxygen','Hydrogen','Carbon_Dioxide','Nitrogen']
-values = [4500, 2500, 1053, 500]
-print(px.data.wind()['strength'].unique())
-
-scatter = go.Scatter(y=px.data.wind()['frequency'], mode="lines")
-pieChart = go.Pie(values=values, labels=labels, hole=.3)
-histogram = go.Histogram(x=df.tips()['day'])
-sankey = go.Sankey(
-    arrangement="snap",
-    node=dict(
-        label=["A", "B", "C"],
-        x=[0, 0, 2],
-        y=[2, 4, 0],
-        color=["lemonchiffon", "paleturquoise", "ghostwhite"],
-        pad=10),  # 10 Pixels
-    link=dict(
-        source=[0, 1],
-        target=[2, 2],
-        value=[1, 2]))
-
-fig = make_subplots(
-    rows=2, cols=2,
-    specs=[[{"type": "sankey"}, {"type": "histogram"}],
-           [{"type": "domain"}, {"type": "scatter"}]],
-)
-
-fig.add_trace(sankey, row=1, col=1)
-fig.add_trace(histogram, row=1, col=2)
-fig.add_trace(pieChart, row=2, col=1)
-fig.add_trace(scatter, row=2, col=2)
-fig.update_layout(height=700, showlegend=False)
-fig.show()
-
 app.layout = html.Div([
-    html.Div(id='output_container', children=[
-        html.Div(
-            children=[html.H1("Regulus heater dada analysis", style={'text-align': 'center'}, className='title'),
-                      html.Div([
-                          html.P('Select Month',
-                                 className='drop_down_list_title'
-                                 ),
-                          dcc.Dropdown(id='select_month',
-                                       multi=False,
-                                       clearable=True,
-                                       disabled=False,
-                                       style={'display': True},
-                                       value='Mar',
-                                       placeholder='Select Month',
-                                       options=[{'label': c, 'value': c}
-                                                for c in ['January', 'February', 'April']],
-                                       className='drop_down_list'),
-                      ], className='title_drop_down_list'),
-                      html.Br(),
-                      dcc.Graph(figure=fig)
-                      ]
-        )
-    ]),
+    html.Br(),
+    dcc.Dropdown(uniqYears, uniqYears[0], id='year-dropdown'),
+    dcc.Graph(id='graph-with-dropdown'),
+    dcc.Graph(id='pie'),
+    dcc.Graph(id='sankey'),
 ])
 
+
+@app.callback(
+    Output('graph-with-dropdown', 'figure'),
+    Output('pie', 'figure'),
+    Output('sankey', 'figure'),
+    Input('year-dropdown', 'value'))
+def update_figure(selected_year):
+    data = df[df['year'] == selected_year]
+
+    fig = go.Figure()
+    fig2 = go.Figure()
+    fig3 = go.Figure()
+
+    # fig.add_trace(go.Bar(x=data["date"],
+    #                      y=data["GOOG"],
+    #                      marker_color='rgb(55, 83, 109)',
+    #                     ))
+    # fig.add_trace(go.Bar(x=data["date"],
+    #                      y=data["AAPL"],
+    #                      marker_color='rgb(26, 118, 255)'
+    #                      ))
+    #
+    fig.add_trace(go.Bar( x=data["date"],
+                         y=data["NFLX"]/10,
+                         marker_color='rgba(124, 189, 255, 0.5)',
+                          name="NTFLX devided by 10"
+                         ))
+
+    sankey = go.Sankey(
+        arrangement="snap",
+        node=dict(
+            label=["A", "B", "C"],
+            x=[0, 0, 2],
+            y=[2, 4, 0],
+            color=["lemonchiffon", "paleturquoise", "ghostwhite"],
+            pad=10),  # 10 Pixels
+        link=dict(
+            source=[0, 1],
+            target=[2, 2],
+            value=[1, 2]))
+
+    fig3.add_trace(sankey)
+
+    fig.add_trace(go.Scatter(x=data["date"], y=data["AAPL"],
+                             mode='lines', name='Apple',))
+    fig.add_trace(go.Scatter(x=data["date"], y=data["GOOG"],
+                             mode='lines', name='Google',))
+    fig.add_trace(go.Scatter(x=data["date"], y=data["FB"],
+                             mode='lines', name='FB',))
+
+    labels = ['AAPL', 'GOOG', 'FB']
+    values = [data['AAPL'].sum(), data['GOOG'].sum(), data['FB'].sum()]
+    fig2.add_trace(go.Pie(values=values, labels=labels, hole=.3))
+
+    fig.update_layout(transition_duration=500)
+
+    return fig, fig2, fig3
+
+
 if __name__ == '__main__':
-    app.run_server(debug=False)
-    # print(client.ping())
+    app.run_server(debug=True)
