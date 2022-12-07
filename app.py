@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 
-import pandas as pd
+from data import get_content_provider
 
 df = px.data.stocks()
 dates = px.data.stocks()["date"].items()
@@ -13,6 +13,7 @@ df["year"] = years
 uniqYears = list(dict.fromkeys([date.year for date in dates_list]))
 
 app = Dash(__name__)
+client = get_content_provider()
 
 app.layout = html.Div(style={'display': 'grid',
                              "grid-template-columns": "1fr 3fr",
