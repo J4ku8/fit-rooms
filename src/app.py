@@ -1,7 +1,8 @@
 from datetime import datetime
 import plotly.graph_objects as go
-from dash import Dash, dcc, html, Input, Output
+from dash import dcc, html, Input, Output, dash
 import plotly.express as px
+from flask import Flask
 
 from data import get_content_provider
 
@@ -12,7 +13,9 @@ years = [date.year for date in dates_list]
 df["year"] = years
 uniqYears = list(dict.fromkeys([date.year for date in dates_list]))
 
-app = Dash(__name__)
+server = Flask(__name__)
+
+app = dash.Dash(server=server)
 client = get_content_provider()
 
 app.layout = html.Div(style={'display': 'grid',

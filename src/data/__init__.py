@@ -1,11 +1,12 @@
 import os
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 from data.Client import Client
 from data.Database import Database
 
-load_dotenv(".env")
+load_dotenv(find_dotenv())
+
 DATABASE = os.getenv("DATABASE")
 PASS = os.getenv("PASSWORD")
 USER = os.getenv("USERNAME")

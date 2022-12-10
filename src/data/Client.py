@@ -1,6 +1,3 @@
-import os
-
-from dotenv import load_dotenv
 from influxdb import DataFrameClient
 
 from data.Database import Database
