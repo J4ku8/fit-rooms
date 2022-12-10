@@ -17,6 +17,7 @@ server = Flask(__name__)
 
 app = dash.Dash(server=server)
 client = get_content_provider()
+print(client.getHpPowerConsuption())
 
 app.layout = html.Div(style={'display': 'grid',
                              "grid-template-columns": "1fr 3fr",
