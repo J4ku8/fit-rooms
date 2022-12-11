@@ -19,7 +19,7 @@ class Database(ABC):
         pass
 
     @abstractmethod
-    def getWaterTemp(self):
+    def getMeanWaterTemp(self):
         pass
 
     @abstractmethod

@@ -1,4 +1,6 @@
 from datetime import datetime
+
+import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc, html, Input, Output, dash
 import plotly.express as px
@@ -17,7 +19,8 @@ server = Flask(__name__)
 
 app = dash.Dash(server=server)
 client = get_content_provider()
-print(client.getHpPowerConsuption())
+data = client.getHpPowerConsuption(bucket='power')
+print(client.explore())
 
 app.layout = html.Div(style={'display': 'grid',
                              "grid-template-columns": "1fr 3fr",
