@@ -1,2 +1,3 @@
-experiment.py
 .env
+.idea
+venv
