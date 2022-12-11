@@ -1,6 +1,11 @@
 from influxdb import DataFrameClient
 from data.Database import Database
 
+from data.Enums import RegulusStatuses, RegulusAttributes, PowerDevices, Buckets
+
+DEFAULT_START_DATE = "1634470536296ms"
+
+
 class Client(Database):
     def __init__(self, database, user, port, host, password):
         self.database = database
@@ -11,135 +16,77 @@ class Client(Database):
         self.client = DataFrameClient(host=host, port=port, username=user, password=password, database=database)
 
     def explore(self):
-        return self.client.query("SELECT sum(value) FROM power WHERE device = 'hp' AND target='None' AND time >= 1650281678535ms GROUP BY time(1d) fill(0)")
+        return self.client.query("SELECT sum(value) FROM power GROUP BY device")
+
+    def getAllStats(self, bucket):
+        queryResult = self.client.query(
+            f"SELECT * FROM  {bucket}")
+        df = queryResult[bucket]
+        df.reset_index(inplace=True)
+        df = df.rename(columns={'index': 'time'})
+        return df
 
     def getMeasurements(self):
         return self.client.query("SHOW MEASUREMENTS ON homedata")
 
-    def getHpPowerConsuption(self, bucket):
+    def getHpPowerConsuption(self, device: str = "hp", time_from: str = DEFAULT_START_DATE):
+        if not isinstance(device, PowerDevices):
+            raise TypeError('Device must be an instance of PowerDevices Enum')
+        bucket = Buckets.POWER
         queryResult = self.client.query(
-            f"SELECT sum(value) FROM {bucket} WHERE device = 'hp' AND target='None' AND time >= 1650281678535ms GROUP BY time(1d) fill(0)")
+            f"SELECT sum(value) FROM {bucket} WHERE device = {device} AND target='None' AND time >= {time_from} GROUP BY time(1d) fill(0)")
         df = queryResult[bucket]
         df.reset_index(inplace=True)
         df = df.rename(columns={'index': 'time'})
         return df
 
-    def getHpWaterSuply(self, bucket):
+    def getHpWaterSuply(self, device: str = "hp", time_from: str = DEFAULT_START_DATE):
+        if not isinstance(device, PowerDevices):
+            raise TypeError('Device must be an instance of PowerDevices Enum')
+        bucket = Buckets.POWER
         queryResult = self.client.query(
-            f"SELECT sum(value) FROM {bucket} WHERE device = 'hp' AND target='washwater' AND time >= 1650281622624ms GROUP BY time(1d) fill(null)")
+            f"SELECT sum(value) FROM {bucket} WHERE device = {device} AND target='washwater' AND time >= {time_from} GROUP BY time(1d) fill(0)")
         df = queryResult[bucket]
         df.reset_index(inplace=True)
         df = df.rename(columns={'index': 'time'})
         return df
 
-    def getHpHeatingSuply(self, bucket):
-        queryResult =  self.client.query(
-            f"SELECT sum(value) FROM {bucket} WHERE device = 'hp' AND target='heating' AND time >= 1650281622624ms GROUP BY time(1d) fill(null)")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-
-    def getMeanWaterTemp(self, bucket):
+    def getHpHeatingSuply(self, device: str = "hp", time_from: str = DEFAULT_START_DATE):
+        if not isinstance(device, PowerDevices):
+            raise TypeError('Device must be an instance of PowerDevices Enum')
+        bucket = Buckets.POWER
         queryResult = self.client.query(
-            f"SELECT mean(washwater_temp) FROM {bucket} WHERE time >= 1650281691720ms GROUP BY time(1d) fill(null)")
+            f"SELECT sum(value) FROM {bucket} WHERE device = {device} AND target='heating' AND time >= {time_from} GROUP BY time(1d) fill(0)")
         df = queryResult[bucket]
         df.reset_index(inplace=True)
         df = df.rename(columns={'index': 'time'})
         return df
 
-    def getTempOut(self, bucket):
+    def getMeanOfRegulusFromRange(self, attribute: str, time_from=DEFAULT_START_DATE, time_to="1666092936296ms"):
+        if not isinstance(attribute, RegulusAttributes):
+            raise TypeError('Attribute must be an instance of RegulusAttributes Enum')
+        bucket = Buckets.REGULUS
         queryResult = self.client.query(
-            f"SELECT mean(temp_out) FROM {bucket} WHERE time >= 1634470536296ms and time <= 1666092936296ms GROUP BY time(1d) fill(null)")
+            f"SELECT mean({attribute}) FROM {bucket} WHERE time >= {time_from} and time <= {time_to} GROUP BY time(1d) fill(0)")
         df = queryResult[bucket]
         df.reset_index(inplace=True)
         df = df.rename(columns={'index': 'time'})
         return df
 
-    def getTempIn(self, bucket):
-        queryResult =  self.client.query(
-            f"SELECT mean(temp_in) FROM {bucket} WHERE time >= 1634470536296ms and time <= 1666092936296ms GROUP BY time(1d) fill(null)")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getRPS(self, bucket):
+    def getOutsideTemp(self, time_from: str = DEFAULT_START_DATE):
         queryResult = self.client.query(
-            f"SELECT mean(rps) FROM {bucket} WHERE time >= 1634470536296ms and time <= 1666092936296ms GROUP BY time(1d) fill(null)")
-        df = queryResult[bucket]
+            f"SELECT mean(temperature) FROM weather WHERE time >= {time_from} GROUP BY time(1d) fill(none)")
+        df = queryResult["weather"]
         df.reset_index(inplace=True)
         df = df.rename(columns={'index': 'time'})
         return df
 
-    def getOutsideTemp(self, bucket):
+    def getRegulusStatusCount(self, status="topi", time_from: str = DEFAULT_START_DATE):
+        if not isinstance(status, RegulusStatuses):
+            raise TypeError('Status must be an instance of RegulusStatuses Enum')
+        bucket = Buckets.REGULUS
         queryResult = self.client.query(
-            f"SELECT mean(temperature) FROM {bucket} WHERE time >= 1650281888485ms GROUP BY time(1d) fill(none)")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getHeatingCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='topi' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getPreparingCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='pripravuje TV' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getCheckCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='kontrola prutoku' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getDefrostCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='odmrazuje' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getHpDamageCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='porucha PWM cepadla' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getReadyCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='pripraven topit' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getRestartCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='restartuje' and time >= 1650281820284ms GROUP BY status;")
-        df = queryResult[bucket]
-        df.reset_index(inplace=True)
-        df = df.rename(columns={'index': 'time'})
-        return df
-
-    def getMinRunTimeCount(self, bucket):
-        queryResult = self.client.query(
-            f"SELECT count(status) FROM {bucket} WHERE status='min.doba chodu' and time >= 1650281820284ms GROUP BY status;")
+            f"SELECT count(status) FROM {bucket} WHERE status={status} and time >= {time_from} GROUP BY status")
         df = queryResult[bucket]
         df.reset_index(inplace=True)
         df = df.rename(columns={'index': 'time'})

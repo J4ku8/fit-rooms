@@ -19,7 +19,7 @@ server = Flask(__name__)
 
 app = dash.Dash(server=server)
 client = get_content_provider()
-data = client.getHpPowerConsuption(bucket='power')
+# data = client.getHpPowerConsuption(bucket=Buckets.POWER)
 print(client.explore())
 
 app.layout = html.Div(style={'display': 'grid',

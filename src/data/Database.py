@@ -7,6 +7,10 @@ class Database(ABC):
         pass
 
     @abstractmethod
+    def getAllStats(self):
+        pass
+
+    @abstractmethod
     def getHpPowerConsuption(self):
         pass
 
@@ -15,57 +19,17 @@ class Database(ABC):
         pass
 
     @abstractmethod
+    def getMeanOfRegulusFromRange(self):
+        pass
+
+    @abstractmethod
     def getHpWaterSuply(self):
         pass
 
     @abstractmethod
-    def getMeanWaterTemp(self):
-        pass
-
-    @abstractmethod
-    def getTempIn(self):
-        pass
-
-    @abstractmethod
-    def getTempOut(self):
-        pass
-
-    @abstractmethod
-    def getRPS(self):
+    def getRegulusStatusCount(self):
         pass
 
     @abstractmethod
     def getOutsideTemp(self):
-        pass
-
-    @abstractmethod
-    def getHeatingCount(self):
-        pass
-
-    @abstractmethod
-    def getPreparingCount(self):
-        pass
-
-    @abstractmethod
-    def getCheckCount(self):
-        pass
-
-    @abstractmethod
-    def getDefrostCount(self):
-        pass
-
-    @abstractmethod
-    def getHpDamageCount(self):
-        pass
-
-    @abstractmethod
-    def getReadyCount(self):
-        pass
-
-    @abstractmethod
-    def getRestartCount(self):
-        pass
-
-    @abstractmethod
-    def getMinRunTimeCount(self):
         pass
