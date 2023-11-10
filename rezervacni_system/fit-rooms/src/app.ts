@@ -3,6 +3,7 @@ import helmet from 'helmet';
 // import compression from 'compression';
 import compressFilter from './utils/compressFilter.util';
 import config from './config/config';
+import getTeamsRoutes from "./controller/ms-teams/getTeamsRoutes";
 // import cors from 'cors';
 
 const app: Express = express();
@@ -18,9 +19,8 @@ const app: Express = express();
 app.use(helmet());
 
 // app.use(compression({ filter: compressFilter }));
+app.get("/", (req, res) => res.json({ message: "success" }))
 
-app.get('/', (_req: Request, res: Response) => {
-    res.send('Hello World!');
-});
+app.use('/teams', getTeamsRoutes);
 
 export default app;
