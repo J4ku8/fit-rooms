@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - '27017:27017'
+  synchronizer:
+    image: fit-rooms-synchronizer
+    container_name: fit-rooms-synchronizer
+    ports:
+      - '4040:4040'
+  view:
+    image: fit-rooms-view
+    container_name: fit-rooms-view
+    ports:
+      - '4041:4041'

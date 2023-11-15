@@ -5,5 +5,6 @@ declare namespace NodeJS {
         readonly CORS_ORIGIN: string;
         readonly CLIENT_ID: string;
         readonly CLIENT_SECRET: string;
+        readonly SIRIUS_ENDPOINT: string;
     }
 }
