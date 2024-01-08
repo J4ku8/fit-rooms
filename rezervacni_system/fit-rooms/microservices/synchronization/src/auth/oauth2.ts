@@ -1,6 +1,6 @@
 import config from "../config/config";
 import OAuth2Client from "./oauth2-client";
-import {OAuthConfig, TokenResponse} from "../utils/types";
+import {OAuthConfig} from "../utils/types";
 
 
 const authConfigCvut: OAuthConfig = {
@@ -12,17 +12,10 @@ const authConfigCvut: OAuthConfig = {
 
 export class TokenManager {
     private expiresIn: number;
-    private _accessToken: string;
+    private accessToken: string;
 
-    get accessToken(): string {
-        return this._accessToken;
-    }
-
-    set accessToken(value: "") {
-        this._accessToken = value;
-    }
     constructor() {
-        this._accessToken = "";
+        this.accessToken = "";
         this.expiresIn = 0;
     }
 
@@ -32,9 +25,8 @@ export class TokenManager {
         try {
             const { access_token: newAccessToken, expires_in: newExpiryDate } = await oauth2Client.getToken();
 
-            this._accessToken = newAccessToken;
+            this.accessToken = newAccessToken;
             this.expiresIn = newExpiryDate;
-
             console.log('Nový token získán.');
             this.scheduleTokenRefresh();
         } catch (error) {
@@ -52,11 +44,11 @@ export class TokenManager {
 
     // @ts-ignore
     async getAccessToken() {
-        if (!this._accessToken || this.expiresIn < 60) {
+        if (!this.accessToken || this.expiresIn < 60) {
             console.log('Token není platný nebo brzy expiruje. Probíhá obnovení...');
             await this.requestNewToken();
         }
 
-        return this._accessToken;
+        return this.accessToken;
     }
 }

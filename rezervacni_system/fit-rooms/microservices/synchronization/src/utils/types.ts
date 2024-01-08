@@ -44,3 +44,12 @@ export type TokenResponse = {
 export type ApiQuery = {
     query?: string
 }
+
+export type AtomlessObject = {
+    [key: string]: string | AtomlessObject | AtomlessObject[];
+};
+
+export type KosApiHandleTypes<T = any> = {
+    query: string;
+    args?: T;
+};
