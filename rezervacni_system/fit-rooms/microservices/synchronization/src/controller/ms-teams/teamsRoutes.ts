@@ -3,13 +3,13 @@ import axios from "axios";
 
 const router: Router = express.Router();
 
-
 router.get('/room/:roomKosId/', async (req: Request, res: Response) => {
     try {
         const response = await axios.get('https://api.example.com/data');
         const roomId = req.params.roomKosId;
         res.send(`Room id: ${roomId}`);
     } catch (error: any) {
+        console.log(0)
         // Handle errors
         console.error('Error making API call:', error?.message);
     }
@@ -20,6 +20,7 @@ router.get('/rooms', async (req: Request, res: Response) => {
         const response = await axios.get('https://api.example.com/data');
         res.send(`Rooms`);
     } catch (error: any) {
+        console.log(1)
         // Handle errors
         console.error('Error making API call:', error?.message);
     }
@@ -30,6 +31,7 @@ router.get('/events', async (req: Request, res: Response) => {
         const response = await axios.get('https://api.example.com/data');
         res.send(`events`);
     } catch (error: any) {
+        console.log(2)
         // Handle errors
         console.error('Error making API call:', error?.message);
     }
