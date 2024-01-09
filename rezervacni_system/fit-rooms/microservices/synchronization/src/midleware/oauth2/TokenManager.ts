@@ -1,6 +1,6 @@
-import config from "../config/config";
-import OAuth2Client from "./oauth2-client";
-import {OAuthConfig} from "../utils/types";
+import {OAuthConfig} from "../../../utils/types";
+import config from "../../../config/config";
+import OAuth2Client from "./OAuth2Client";
 
 
 const authConfigCvut: OAuthConfig = {

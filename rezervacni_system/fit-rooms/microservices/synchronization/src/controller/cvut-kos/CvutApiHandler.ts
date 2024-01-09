@@ -1,9 +1,9 @@
 import axios from "axios";
 import { KosApiHandleTypes } from "../../utils/types";
 import xmlParser from "../../utils/xml-parser";
-import {TokenManager} from "../../auth/oauth2";
+import {TokenManager} from "../../midleware/oauth2/TokenManager";
 
-class KosApiHandler {
+class CvutApiHandler {
     private tokenManager: TokenManager
 
     constructor() {
@@ -22,4 +22,4 @@ class KosApiHandler {
     }
 }
 
-export default KosApiHandler
+export default CvutApiHandler

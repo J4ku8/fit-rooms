@@ -1,8 +1,7 @@
 import {AxiosError, AxiosResponse} from "axios";
-import {OAuthConfig, TokenResponse} from "../utils/types";
-import {encodeCredentials} from "../utils/base64encode";
-
-const axios = require('axios');
+import axios from 'axios';
+import {OAuthConfig, TokenResponse} from "../../utils/types";
+import {encodeCredentials} from "../../utils/base64encode";
 
 function isOAuthError(error: unknown): error is AxiosError {
     return axios.isAxiosError(error);
