@@ -9,8 +9,8 @@ export const sampleRoomsData: Room[] = [
 ]
 
 export const sampleEventsData: Event[] = [
-  { room: "TH:A-905", name: 'Pokec', organiser: "tichyj15", from: "2024-01-011T122:00:00",to: "2024-01-011T122:00:00" },
-  { room: "TH:A-905", name: 'Pokec', organiser: "tichyj15", from: "2024-01-011T122:00:00",to: "2024-01-011T122:00:00" },
-  { room: "TH:A-1015", name: 'Pokec', organiser: "tichyj15", from: "2024-01-011T122:00:00",to: "2024-01-011T122:00:00" },
-  { room: "TH:A-955", name: 'Pokec', organiser: "tichyj15", from: "2024-01-011T122:00:00",to: "2024-01-011T122:00:00" },
+  { room: "TH:A-905", name: 'Pokec', organiser: "tichyj15", from: "2024-01-13T22:00:00.000Z",to: "2024-01-13T23:00:00.000Z" },
+  { room: "TH:A-905", name: 'Pokec', organiser: "tichyj15", from: "2024-01-13T22:00:00.000Z",to: "2024-01-13T23:00:00.000Z" },
+  { room: "TH:A-1015", name: 'Pokec', organiser: "tichyj15", from: "2024-01-13T22:00:00.000Z",to: "2024-01-13T23:00:00.000Z" },
+  { room: "TH:A-955", name: 'Pokec', organiser: "tichyj15", from: "2024-01-13T22:00:00.000Z",to: "2024-01-13T23:00:00.000Z" },
 ]

@@ -1,25 +1,28 @@
 import { GetStaticProps } from 'next'
-import { Room } from '../../types'
-import { sampleRoomsData } from '../../utils/sample-data'
+import { Event } from '../../types'
+import {sampleEventsData, sampleRoomsData} from '../../utils/sample-data'
 import Layout from '../../components/Layout'
-import List from '../../components/List'
+import RoomList from '../../components/Room/RoomList'
+import Providers from "../../components/Providers";
 
 type Props = {
-  items: Room[]
+  items: Event[]
 }
+
 
 const WithStaticProps = ({ items }: Props) => {
 
     return (
-        <Layout title="Users List | Next.js + TypeScript Example">
+        <Providers transparentFooter title="Users List">
             <h1>List of all available rooms</h1>
-            <List items={items}/>
-        </Layout>
+            <RoomList items={items}/>
+        </Providers>
+
     );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const items: Room[] = sampleRoomsData
+  const items: Event[] = sampleEventsData
   return { props: { items } }
 }
 

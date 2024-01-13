@@ -1,9 +1,10 @@
 import {GetStaticProps, GetStaticPaths} from 'next'
 import { Room as RoomType } from "../../types/index"
 import Layout from '../../components/Layout'
-import {GlobalContextProvider} from "../../context/GlobalContext";
-import Room from "../../components/Room";
+import Room from "../../components/Room/Room";
 import {sampleRoomsData} from "../../utils/sample-data";
+import {Typography} from "@mui/material";
+import Providers from "../../components/Providers";
 
 type Props = {
     item?: RoomType
@@ -11,27 +12,24 @@ type Props = {
 }
 
 const StaticPropsDetail = ({item, errors}: Props) => {
-
     if (errors) {
         return (
             <Layout title="Error | Next.js + TypeScript Example">
                 <p>
-                    <span style={{color: 'red'}}>Error:</span> {errors}
+                    <Typography style={{color: 'red'}}>Error:</Typography> {errors}
                 </p>
             </Layout>
         )
     }
 
     return (
-        <GlobalContextProvider>
-            <Layout
+            <Providers
                 title={`${
                     item ? item.id : 'Room Detail'
-                } | Next.js + TypeScript Example`}
+                }`}
             >
-                <Room/>
-            </Layout>
-        </GlobalContextProvider>
+                <Room id={item ? item.id : 'Room Detail'}/>
+            </Providers>
     )
 }
 
@@ -42,7 +40,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
     const paths = sampleRoomsData.map((room) => ({
         params: {id: room.id.toString()},
     }))
-
     // We'll pre-render only these paths at build time.
     // { fallback: false } means other routes should 404.
     return {paths, fallback: false}
@@ -57,7 +54,7 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
         const item = sampleRoomsData.find((data) => data.id === String(id))
         // By returning { props: item }, the StaticPropsDetail component
         // will receive `item` as a prop at build time
-        return {props: {item}}
+        return {props: { item }}
     } catch (err: any) {
         return {props: {errors: err.message}}
     }

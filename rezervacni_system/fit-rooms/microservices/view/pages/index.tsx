@@ -1,17 +1,19 @@
 import Link from 'next/link'
 import Layout from '../components/Layout'
-import React, {useCallback, useEffect, useState} from "react";
-import {GlobalContextProvider} from "../context/GlobalContext";
+import React from "react";
+import {Typography} from "@mui/material";
+import "../styles.css"
+import Providers from "../components/Providers";
+
+
+
 
 const IndexPage = () => {
-
     return (
-        <GlobalContextProvider>
-            <Layout title='Room reservation system'>
-                <h1>This is index page</h1>
-                <Link href="/rooms">Rooms</Link>
-            </Layout>
-        </GlobalContextProvider>
+                    <Providers transparentFooter title='Room reservation system'>
+                        <Typography variant="h1" >This is index page</Typography>
+                        <Link href="/rooms">Rooms</Link>
+                    </Providers>
     );
 }
 

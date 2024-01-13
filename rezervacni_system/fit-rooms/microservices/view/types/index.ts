@@ -4,6 +4,8 @@
 //
 // import { User } from 'path/to/interfaces';
 
+import {ReactNode} from "react";
+
 export type Event = {
   room: string
   name: string
@@ -14,4 +16,10 @@ export type Event = {
 
 export type Room = {
  id: string
+}
+
+export type ProvidersProps = {
+  children: ReactNode
+  title?: string
+  transparentFooter?: boolean
 }
