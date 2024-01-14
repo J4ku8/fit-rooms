@@ -1,7 +1,7 @@
 import {GetStaticProps, GetStaticPaths} from 'next'
 import { Room as RoomType } from "../../types/index"
 import Layout from '../../components/Layout'
-import Room from "../../components/Room/Room";
+import Room from "../../components/Room";
 import {sampleRoomsData} from "../../utils/sample-data";
 import {Typography} from "@mui/material";
 import Providers from "../../components/Providers";

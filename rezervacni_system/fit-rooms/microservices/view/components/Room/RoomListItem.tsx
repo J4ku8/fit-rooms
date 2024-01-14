@@ -1,15 +1,15 @@
 import React from 'react'
 import Link from 'next/link'
 
-import { Event } from '../types'
+import { Room } from '../../types'
 
 type Props = {
-  data: Event
+  data: Room
 }
 
 const RoomListItem = ({ data }: Props) => (
-  <Link href="/rooms/[id]" as={`/rooms/${data.room}`}>
-    {data.room}
+  <Link href="/rooms/[id]" as={`/rooms/${data.id}`}>
+    {data.id}
   </Link>
 )
 

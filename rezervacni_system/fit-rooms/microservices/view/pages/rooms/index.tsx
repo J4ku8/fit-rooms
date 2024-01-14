@@ -1,7 +1,6 @@
 import { GetStaticProps } from 'next'
 import { Event } from '../../types'
-import {sampleEventsData, sampleRoomsData} from '../../utils/sample-data'
-import Layout from '../../components/Layout'
+import {sampleEventsData} from '../../utils/sample-data'
 import RoomList from '../../components/Room/RoomList'
 import Providers from "../../components/Providers";
 

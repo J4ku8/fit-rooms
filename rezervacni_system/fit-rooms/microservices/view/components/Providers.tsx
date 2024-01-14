@@ -1,4 +1,3 @@
-import {ReactNode} from "react";
 import {QueryClientProvider} from "react-query";
 import queryClient from "../utils/query-client";
 import {GlobalContextProvider} from "../context/GlobalContext";

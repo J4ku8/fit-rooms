@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Layout from '../components/Layout'
 import React from "react";
 import {Typography} from "@mui/material";
 import "../styles.css"

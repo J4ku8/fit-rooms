@@ -1,9 +1,9 @@
 import * as React from 'react'
 import RoomListItem from './RoomListItem'
-import { Event } from '../types'
+import { Room } from '../../types'
 
 type Props = {
-  items: Event[]
+  items: Room[]
 }
 
 const RoomList = ({ items }: Props) => (
