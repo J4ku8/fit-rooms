@@ -16,7 +16,7 @@ export const useGetEvents = (room: string) => {
 
         return await response.json();
     }, {
-        refetchInterval: 300000,
+        refetchInterval: 3000,
 
     });
 }
