@@ -1,26 +1,22 @@
 import cron from 'node-cron';
+import {currentTime, isoToCron} from "../../utils/time-handler";
 
-// teachers timetable, parallels, courseEvents
-const every5MinutesTask = cron.schedule('*/5 * * * *', () => {
-    console.log('Tato funkce se spustí každých 5 minut');
+// parallels, courseEvents
+const kosSync = cron.schedule('*/30 * * * *', () => {
+    console.log(currentTime(), 'Tato funkce se spustí každou půl hodinu');
 });
 
-// semester, then to DB
-const monthlyTask = cron.schedule('0 0 1 * *', () => {
-    console.log('Tato funkce se spustí jednou za měsíc');
-});
-
-// employees, then to DB
-const dailyTask = cron.schedule('0 2 * * *', () => {
-    console.log('Tato funkce se spustí jednou za týden (v neděli)');
+// semester, then to DB -> schedule cron to start/end of semester
+const semesterTask = (semesterTime: string) => cron.schedule(semesterTime, () => {
+    console.log('Tato funkce se spustí začátkem semestru');
 });
 
 
 
-const initCrons = () => {
-    every5MinutesTask.start();
-    monthlyTask.start();
-    dailyTask.start();
+const initCrons = (semesterTriggerTime: Date) => {
+    const cronDate = isoToCron(semesterTriggerTime)
+    kosSync.start();
+    semesterTask(cronDate).start();
 }
 
 export default initCrons

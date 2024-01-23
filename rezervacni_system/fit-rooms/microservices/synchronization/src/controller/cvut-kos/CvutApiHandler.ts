@@ -1,5 +1,5 @@
 import axios from "axios";
-import { KosApiHandleTypes } from "../../utils/types";
+import {AtomlessObject, KosApiHandleTypes, KosApiRoutes} from "../../utils/types";
 import xmlParser from "../../utils/xml-parser";
 import {TokenManager} from "../../midleware/oauth2/TokenManager";
 
@@ -10,14 +10,19 @@ class CvutApiHandler {
         this.tokenManager = new TokenManager()
     }
 
-    handleApiCall = async ({query}: KosApiHandleTypes): Promise<any> => {
+    handleApiCall = async ({query}: KosApiHandleTypes): Promise<AtomlessObject[]> => {
         const token = await this.tokenManager.getAccessToken()
-        const response = await axios.get(query,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        const response = await axios.get(query, config);
+        if(query.includes(KosApiRoutes.SEMESTER)){
+            const semesterName = await axios.get(`${query}/current`, config);
+            const semesterInfo = await axios.get(`${query}/${semesterName.data}`, config);
+            return await xmlParser(semesterInfo.data)
+        }
         return await xmlParser(response.data)
     }
 }

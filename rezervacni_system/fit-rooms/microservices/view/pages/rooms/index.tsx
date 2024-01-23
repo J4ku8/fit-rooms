@@ -1,11 +1,11 @@
 import { GetStaticProps } from 'next'
-import { Event } from '../../types'
-import {sampleEventsData} from '../../utils/sample-data'
+import { Room } from '../../types'
+import {sampleRoomsData} from '../../utils/sample-data'
 import RoomList from '../../components/Room/RoomList'
 import Providers from "../../components/Providers";
 
 type Props = {
-  items: Event[]
+  items: Room[]
 }
 
 
@@ -21,7 +21,7 @@ const WithStaticProps = ({ items }: Props) => {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const items: Event[] = sampleEventsData
+  const items: Room[] = sampleRoomsData
   return { props: { items } }
 }
 

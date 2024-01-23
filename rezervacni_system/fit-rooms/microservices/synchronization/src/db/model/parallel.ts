@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { EventTypes } = require('../../../../utils/types'); // Adjust the path as needed
+import mongoose from "mongoose";
+import {EventTypes} from "../../utils/types";
 
 const Schema = mongoose.Schema;
 
@@ -26,12 +26,12 @@ const eventSchema = new Schema({
         type: String, // Assuming room is a String, adjust the type accordingly
         default: 'Default Room',
     },
-    people: {
-        type: [String], // Assuming people is an array of strings, adjust the type accordingly
-        default: [],
+    organiser: {
+        type: String, // Assuming people is an array of strings, adjust the type accordingly
+        default: "",
     },
 });
 
-const ScheduledEvent = mongoose.model('Event', eventSchema);
+const Parallel = mongoose.model('Parallel', eventSchema);
 
-export default ScheduledEvent
+export default Parallel

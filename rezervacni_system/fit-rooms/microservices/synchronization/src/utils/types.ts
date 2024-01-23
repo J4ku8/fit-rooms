@@ -1,8 +1,9 @@
+import { Document, Model } from 'mongoose';
 
 
 export enum KosApiRoutes {
     DIVISION =  "/rooms",
-    SEMESTER = "/semesters/current",
+    SEMESTER = "/semesters",
     PARALLELS = "/parallels",
     COURSE_EVENT = "/courseEvents",
     TEACHERS = "/teachers"
@@ -53,3 +54,11 @@ export type KosApiHandleTypes<T = any> = {
     query: string;
     args?: T;
 };
+
+export type SemesterSchema = {
+    name: string;
+    from: Date;
+    to: Date;
+}
+export interface SemesterDocument extends SemesterSchema, Document {}
+
