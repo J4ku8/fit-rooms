@@ -8,8 +8,10 @@
     "build": "./node_modules/.bin/tsc"
   },
   "dependencies": {
+    "@azure/identity": "^4.0.1",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.9.0",
+    "@types/node": "^20.11.5",
     "axios": "^1.6.1",
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
@@ -17,24 +19,29 @@
     "express-basic-auth": "^1.2.1",
     "express-session": "^1.17.3",
     "helmet": "^7.1.0",
+    "isomorphic-fetch": "^3.0.0",
     "mongodb": "^6.2.0",
     "mongoose": "^8.0.0",
     "node-cron": "^3.0.3",
     "passport": "^0.6.0",
     "passport-oauth2": "^1.7.0",
+    "readline-sync": "^1.4.10",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
     "winston": "^3.8.2",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@microsoft/microsoft-graph-types": "^2.40.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.16",
     "@types/dotenv": "^8.2.0",
     "@types/express-session": "^1.17.10",
+    "@types/isomorphic-fetch": "^0.0.39",
     "@types/node-cron": "^3.0.11",
     "@types/passport": "^1.0.15",
     "@types/passport-oauth2": "^1.4.15",
+    "@types/readline-sync": "^1.4.8",
     "@types/xml2js": "^0.4.14"
   }
 }

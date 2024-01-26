@@ -1,19 +1,18 @@
 
 import OAuth2Client from "./OAuth2Client";
-import {OAuthConfig} from "../../utils/types";
+import {MicrosoftAttributed, OAuthConfig} from "../../utils/types";
 import config from "../../config/config";
 
 
 const authConfigCvut: OAuthConfig = {
-    clientId: config.client_id,
-    clientSecret: config.client_secret,
     tokenEndpoint: config.cvut_oauth_token_uri,
-    scope: "cvut:kosapi:read"
+    scope: "cvut:kosapi:read",
+    ...config
 }
 
-export class TokenManager {
-    private expiresIn: number;
-    private accessToken: string;
+export class TokenManager{
+    protected expiresIn: number;
+    protected accessToken: string;
 
     constructor() {
         this.accessToken = "";
@@ -22,7 +21,6 @@ export class TokenManager {
 
     async requestNewToken(): Promise<void>{
         const oauth2Client = new OAuth2Client(authConfigCvut);
-
         try {
             const { access_token: newAccessToken, expires_in: newExpiryDate } = await oauth2Client.getToken();
 

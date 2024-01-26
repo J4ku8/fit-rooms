@@ -15,7 +15,7 @@ class OAuth2Client {
 
     async getToken(): Promise<TokenResponse> {
         try {
-            const authHeader = encodeCredentials(this.config.clientId, this.config.clientSecret);
+            const authHeader = encodeCredentials(this.config.client_id_kos, this.config.client_secret_kos);
             const customHeaders = {
                 Authorization: `Basic ${authHeader}`,
                 'Content-Type': 'application/x-www-form-urlencoded'

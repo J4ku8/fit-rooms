@@ -29,12 +29,20 @@ export type SubEventTypes = {
     short: [EventTypes.exam]
     adhoc: [EventTypes.course_event, EventTypes.assessment, EventTypes.teacher_timetable_slot]
 }
-
-export type OAuthConfig = {
+export interface AppSettings {
     clientId: string;
     clientSecret: string;
+    tenantId: string;
+}
+
+export type OAuthConfig = {
+    client_id_kos: string;
+    client_secret_kos: string;
+    client_id_ms: string;
+    client_secret_ms: string;
+    tenant_id_ms: string;
     tokenEndpoint: string;
-    scope: string
+    scope: string;
 }
 
 export type TokenResponse = {
@@ -42,8 +50,8 @@ export type TokenResponse = {
     expires_in: number;
 };
 
-export type ApiQuery = {
-    query?: string
+export interface MicrosoftAttributed {
+    isMicrosoft: boolean;
 }
 
 export type AtomlessObject = {

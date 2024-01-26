@@ -6,7 +6,7 @@ import Room from "../../db/model/room";
 
 ;
 
-export class KosApi extends CvutApiHandler{
+export class KosApiClient extends CvutApiHandler{
 
     private _filterEventsByRooms = async (events: any) => {
         const rooms = await Room.find({})
@@ -85,7 +85,7 @@ export class KosApi extends CvutApiHandler{
         try {
             let offset = 0
             // timetableSlot.room.code==T9:602
-            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=${offset}&query=semester==${semester}&query=division==18000`})
+            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=${offset}&query=semester==${semester}`})
             console.log(res[0])
             console.log(res.length)
             return await this._extractParallels(res)

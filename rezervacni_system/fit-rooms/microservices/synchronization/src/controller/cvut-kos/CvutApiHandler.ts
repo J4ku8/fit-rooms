@@ -1,7 +1,7 @@
 import axios from "axios";
 import {AtomlessObject, KosApiHandleTypes, KosApiRoutes} from "../../utils/types";
 import xmlParser from "../../utils/xml-parser";
-import {TokenManager} from "../../midleware/oauth2/TokenManager";
+import {TokenManager} from "../../midleware/auth/TokenManager";
 
 class CvutApiHandler {
     private tokenManager: TokenManager
