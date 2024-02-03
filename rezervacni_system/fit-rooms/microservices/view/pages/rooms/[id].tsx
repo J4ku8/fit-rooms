@@ -5,6 +5,7 @@ import Room from "../../components/Room";
 import {sampleRoomsData} from "../../utils/sample-data";
 import {Typography} from "@mui/material";
 import Providers from "../../components/Providers";
+import {getRooms} from "../../db";
 
 type Props = {
     item?: RoomType
@@ -36,8 +37,9 @@ const StaticPropsDetail = ({item, errors}: Props) => {
 export default StaticPropsDetail
 
 export const getStaticPaths: GetStaticPaths = async () => {
+    const rooms = await getRooms()
     // Get the paths we want to pre-render based on users
-    const paths = sampleRoomsData.map((room) => ({
+    const paths =  rooms.map((room) => ({
         params: {id: room.id.toString()},
     }))
     // We'll pre-render only these paths at build time.
@@ -50,8 +52,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // direct database queries.
 export const getStaticProps: GetStaticProps = async ({params}) => {
     try {
+        const rooms = await getRooms()
         const id = params?.id
-        const item = sampleRoomsData.find((data) => data.id === String(id))
+        const item = rooms?.find((data) => data.id === String(id))
         // By returning { props: item }, the StaticPropsDetail component
         // will receive `item` as a prop at build time
         return {props: { item }}

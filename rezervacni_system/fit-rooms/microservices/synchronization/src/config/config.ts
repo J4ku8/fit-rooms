@@ -9,6 +9,7 @@ dotenv.config({
 const config = {
   node_env: process.env.NODE_ENV || "",
   port: process.env.PORT || "",
+  db: process.env.DB_URL || "",
   cors_origin: process.env.CORS_ORIGIN || "",
   client_id_kos: process.env.CLIENT_ID_KOS || "",
   client_secret_kos: process.env.CLIENT_SECRET_KOS || "",

@@ -4,8 +4,6 @@ import {LIMIT} from "../../utils/constants";
 import Semester from "../../db/model/semester";
 import Room from "../../db/model/room";
 
-;
-
 export class KosApiClient extends CvutApiHandler{
 
     private _filterEventsByRooms = async (events: any) => {

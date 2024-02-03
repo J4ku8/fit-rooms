@@ -75,6 +75,8 @@ class GraphTutorial {
             ],
             transactionId: '7E163156-7762-4BEB-A1C6-729EA81755A7'
         };
+        const events = await this.client.api(`/users/${roomEmail}/calendar/events`)
+            .post(event);
 
     }
     public async deleteEvent(eventId: string): Promise<void> {
