@@ -1,11 +1,10 @@
 import {GetStaticProps, GetStaticPaths} from 'next'
-import { Room as RoomType } from "../../types/index"
-import Layout from '../../components/Layout'
-import Room from "../../components/Room";
-import {sampleRoomsData} from "../../utils/sample-data";
+import { Room as RoomType } from "../../src/types/index"
+import Layout from '../../src/components/Layout'
 import {Typography} from "@mui/material";
-import Providers from "../../components/Providers";
-import {getRooms} from "../../db";
+import Providers from "../../src/components/Providers";
+import {getRooms} from "../../src/utils/db";
+import Room from "../../src/components/Room";
 
 type Props = {
     item?: RoomType
@@ -26,10 +25,10 @@ const StaticPropsDetail = ({item, errors}: Props) => {
     return (
             <Providers
                 title={`${
-                    item ? item.id : 'Room Detail'
+                    item ? item.name : 'Room Detail'
                 }`}
             >
-                <Room id={item ? item.id : 'Room Detail'}/>
+                <Room id={item ? item.name : 'Room Detail'}/>
             </Providers>
     )
 }
@@ -37,26 +36,17 @@ const StaticPropsDetail = ({item, errors}: Props) => {
 export default StaticPropsDetail
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const rooms = await getRooms()
-    // Get the paths we want to pre-render based on users
+    const { rooms } = await getRooms()
     const paths =  rooms.map((room) => ({
-        params: {id: room.id.toString()},
+        params: {id: room.name.toString()},
     }))
-    // We'll pre-render only these paths at build time.
-    // { fallback: false } means other routes should 404.
     return {paths, fallback: false}
 }
-
-// This function gets called at build time on server-side.
-// It won't be called on client-side, so you can even do
-// direct database queries.
 export const getStaticProps: GetStaticProps = async ({params}) => {
     try {
-        const rooms = await getRooms()
+        const { rooms } = await getRooms()
         const id = params?.id
-        const item = rooms?.find((data) => data.id === String(id))
-        // By returning { props: item }, the StaticPropsDetail component
-        // will receive `item` as a prop at build time
+        const item = rooms?.find((data) => data.name === String(id))
         return {props: { item }}
     } catch (err: any) {
         return {props: {errors: err.message}}

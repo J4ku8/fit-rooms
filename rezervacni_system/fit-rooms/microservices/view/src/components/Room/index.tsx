@@ -12,6 +12,12 @@ const Room = ({ id }: { id: string }) => {
     const { color, setRoomStatus, isRoomFree } = useGlobalContext()
     const theme = useTheme()
     // const roomEvents = useGetEvents(id)
+    // const graphApiClient =  useMicrosoftAuth({
+    //     tenantId: process.env.TENANT_ID_MS || "",
+    //     clientId: "",
+    //     clientSecret: "",
+    //     graphUserScopes: ["user.read"]
+    // })
     const roomEvents = sampleEventsData
 
     const currentEvent = roomEvents.find(event => isRunningEvent(new Date(event.from), new Date(event.to)))

@@ -15,11 +15,29 @@ export type Event = {
 }
 
 export type Room = {
- id: string
+ name: string;
+ label: string;
+ id: string;
 }
 
 export type ProvidersProps = {
   children: ReactNode
   title?: string
   transparentFooter?: boolean
+}
+
+export type AppSettings = {
+  clientId: string;
+  clientSecret: string;
+  tenantId: string;
+  graphUserScopes: string[];
+}
+
+export type GraphApiFetch = {
+  roomId: string
+}
+
+
+export type RoomListType = {
+  rooms: Room[]
 }

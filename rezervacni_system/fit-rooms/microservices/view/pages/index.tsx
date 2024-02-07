@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from "react";
 import {Typography} from "@mui/material";
-import Providers from "../components/Providers";
+import Providers from "../src/components/Providers";
 import "../styles.css"
 
 

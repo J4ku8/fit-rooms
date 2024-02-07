@@ -8,8 +8,8 @@ type Props = {
 }
 
 const RoomListItem = ({ data }: Props) => (
-  <Link href="/rooms/[id]" as={`/rooms/${data.id}`}>
-    {data.id}
+  <Link href="/rooms/[id]" as={`/rooms/${data.name}`}>
+    {data.name}
   </Link>
 )
 

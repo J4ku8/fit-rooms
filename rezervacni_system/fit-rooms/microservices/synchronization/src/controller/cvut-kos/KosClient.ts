@@ -81,9 +81,7 @@ export class KosApiClient extends CvutApiHandler{
     }
     getParallels = async (semester: string = "B231") => {
         try {
-            let offset = 0
-            // timetableSlot.room.code==T9:602
-            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=${offset}&query=semester==${semester}`})
+            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (timetableSlot/room.code==TH:B-378,timetableSlot/room.code==T9:602)`})
             console.log(res[0])
             console.log(res.length)
             return await this._extractParallels(res)
