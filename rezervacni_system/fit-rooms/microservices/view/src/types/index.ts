@@ -33,6 +33,10 @@ export type AppSettings = {
   graphUserScopes: string[];
 }
 
+export type PatternTypes = {
+  [key: string]: string;
+}
+
 export type GraphApiFetch = {
   roomEmail: string
 }

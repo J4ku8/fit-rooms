@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import {sampleEventsData} from "../../../src/utils/sample-data";
 import {isToday} from "../../../src/utils/time-helper";
 import GraphApiClient from "../../../model/GraphApiClient";
-import {AppSettings} from "../../../src/types";
-import {NextError} from "next/dist/lib/is-error";
+import {AppSettings, PatternTypes} from "../../../src/types";
 
 const settings: AppSettings = {
     clientSecret:  process.env.CLIENT_SECRET_MS || "",
@@ -12,23 +10,30 @@ const settings: AppSettings = {
     graphUserScopes: ["user.read"]
 }
 
+const REQURENCE_PATTERN_TYPES: PatternTypes = {
+    DAILY: 'daily',
+    WEEKLY: 'weekly',
+    MONTHLY: "absoluteMonthly"
+};
+
+const REQURENCE_PATTERN_TYPES_ARRAY = Object.keys(REQURENCE_PATTERN_TYPES).map(key => REQURENCE_PATTERN_TYPES[key])
 
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     try {
-        console.log(_req)
         const roomEmail = _req.query.roomEmail
         const microsoftAuth = new GraphApiClient(settings)
         const client = microsoftAuth.initializeGraphForAppOnlyAuth()
         const events = await client?.api(`/users/${roomEmail}/calendar/events`)
             .get();
-        // const result = events.filter(event => {
-        //     const fromDate = event.from;
-        //     const dateObject = new Date(fromDate);
-        //     const isTodayEvent = isToday(dateObject)
-        //     return event.room === roomName && isTodayEvent;
-        // })
-        console.log(events)
-        res.status(200).json(events)
+        // @ts-ignore
+        const filteredEvents = events.value?.filter(event => {
+            if(isToday(new Date(event?.start?.dateTime)) || REQURENCE_PATTERN_TYPES_ARRAY.includes(event.recurrence?.pattern?.type)){
+                // TODO: verify that today is day in week/month/year, which it is schedulled
+                return event
+            }
+        })
+        console.log(filteredEvents?.length)
+        res.status(200).json(events.value)
 
     } catch (err: any) {
         console.log(`Error getting users: ${err}`);

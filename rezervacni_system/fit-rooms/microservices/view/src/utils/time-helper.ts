@@ -2,6 +2,7 @@
 
 export const isToday = (dateObject: Date) => {
     const currentDate = new Date();
+    console.log(dateObject)
     return (
         dateObject.getFullYear() === currentDate.getFullYear() &&
         dateObject.getMonth() === currentDate.getMonth() &&

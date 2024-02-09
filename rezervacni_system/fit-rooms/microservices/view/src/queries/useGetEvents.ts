@@ -9,7 +9,7 @@ export const useGetEvents = ({ roomEmail }: GraphApiFetch) => {
             if (!response.ok) {
                 return []
             }
-            return await response.json();
+            return response.json();
         } catch (error) {
             throw new Error(`Error occured in events fetching: ${error}`);
         }

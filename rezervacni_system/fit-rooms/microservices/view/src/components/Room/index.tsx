@@ -8,13 +8,14 @@ import {formatDate, isRunningEvent} from "../../utils/time-helper";
 import Timer from "../Timer";
 import EventList from "../Event/EventList";
 
+const style = {height: "25%", borderRadius: "10px 10px 0 0"}
 const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
     const { color, setRoomStatus, isRoomFree } = useGlobalContext()
     const theme = useTheme()
-    const { data: { value } } = useGetEvents({roomEmail})
-    console.log(value)
+    const { data } = useGetEvents({roomEmail})
+    console.log(data)
     const roomEvents = sampleEventsData
-
+    const styles = { backgroundColor: color,...{ style } }
     const currentEvent = roomEvents.find(event => isRunningEvent(new Date(event.from), new Date(event.to)))
 
     useEffect(() => {
@@ -23,7 +24,7 @@ const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
 
     return (
         <Box height="90vh" display="flex" flexDirection="column">
-            <Box p={2} style={{ backgroundColor: color, height: "25%", borderRadius: "10px 10px 0 0" }} display="flex" alignItems="center" flexDirection="row" justifyContent="space-between">
+            <Box p={2} style={styles} display="flex" alignItems="center" flexDirection="row" justifyContent="space-between">
                 <Typography variant="h1" fontWeight="bold" >{isRoomFree ? "Free" : "Busy"}</Typography>
                 {roomEvents.length ? <Timer event={isRoomFree ? roomEvents[0] : currentEvent || undefined}/> : null}
             </Box>
