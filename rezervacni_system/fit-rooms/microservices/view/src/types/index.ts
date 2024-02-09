@@ -15,9 +15,9 @@ export type Event = {
 }
 
 export type Room = {
- name: string;
- label: string;
- id: string;
+  emailAddress: string;
+ displayName: string;
+ roomId: string;
 }
 
 export type ProvidersProps = {
@@ -34,7 +34,7 @@ export type AppSettings = {
 }
 
 export type GraphApiFetch = {
-  roomId: string
+  roomEmail: string
 }
 
 

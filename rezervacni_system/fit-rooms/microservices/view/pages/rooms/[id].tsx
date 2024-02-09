@@ -25,10 +25,10 @@ const StaticPropsDetail = ({item, errors}: Props) => {
     return (
             <Providers
                 title={`${
-                    item ? item.name : 'Room Detail'
+                    item ? item.displayName : 'Room Detail'
                 }`}
             >
-                <Room id={item ? item.name : 'Room Detail'}/>
+                <Room roomEmail={item?.emailAddress || ""} name={item ? item?.displayName : "Room detail" }/>
             </Providers>
     )
 }
@@ -38,7 +38,7 @@ export default StaticPropsDetail
 export const getStaticPaths: GetStaticPaths = async () => {
     const { rooms } = await getRooms()
     const paths =  rooms.map((room) => ({
-        params: {id: room.name.toString()},
+        params: {id: room.displayName.toString()},
     }))
     return {paths, fallback: false}
 }
@@ -46,7 +46,7 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
     try {
         const { rooms } = await getRooms()
         const id = params?.id
-        const item = rooms?.find((data) => data.name === String(id))
+        const item = rooms?.find((data) => data.displayName === String(id))
         return {props: { item }}
     } catch (err: any) {
         return {props: {errors: err.message}}

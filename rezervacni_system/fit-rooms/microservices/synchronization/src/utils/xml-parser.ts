@@ -30,7 +30,7 @@ const xmlParser = async (xmlData: string): Promise<AtomlessObject[]> => {
         const result = await new Promise<any>((resolve, reject) => {
             parser.parseString(xmlData, (err: any, result: any) => {
                 if (err) {
-                    console.error('Chyba při parsování XML:', err);
+                    console.error('Error at parsing XML:', err);
                     reject(err);
                 } else {
                     resolve(result);

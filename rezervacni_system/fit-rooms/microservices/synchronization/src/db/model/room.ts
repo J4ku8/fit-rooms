@@ -4,17 +4,17 @@ const Schema = mongoose.Schema;
 
 // Define a schema for an 'Event' collection
 const roomSchema = new Schema({
-    id: {
-        type: Number,
+    roomId: {
+        type: String,
         required: true
     },
-    name: {
+    displayName: {
         type: String,
-        required: false
+        required: true
     },
-    label: {
+    emailAddress: {
         type: String,
-        required: false
+        required: true
     }
 });
 

@@ -1,11 +1,11 @@
-import fetch from 'isomorphic-fetch';
-import { ClientSecretCredential } from '@azure/identity';
-import { Client } from '@microsoft/microsoft-graph-client';
-import { TokenCredentialAuthenticationProvider } from '@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials';
-import {AppSettings} from "../../types";
+import {ClientSecretCredential} from '@azure/identity';
+import {Client} from '@microsoft/microsoft-graph-client';
+import {
+    TokenCredentialAuthenticationProvider
+} from '@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials';
+import {AppSettings} from "../src/types";
 
-
-class MicrosoftAuth {
+class GraphApiClient {
     private settings: AppSettings;
     private clientSecretCredential: ClientSecretCredential | undefined;
     private appClient: Client | undefined;
@@ -26,12 +26,10 @@ class MicrosoftAuth {
                 this.settings.clientSecret
             );
         }
-
         if (!this.appClient) {
             const authProvider = new TokenCredentialAuthenticationProvider(this.clientSecretCredential, {
                 scopes: ['https://graph.microsoft.com/.default'],
             });
-
             this.appClient = Client.initWithMiddleware({
                 authProvider,
             });
@@ -40,7 +38,7 @@ class MicrosoftAuth {
     }
 
     public initializeGraphForAppOnlyAuth(): Client {
-        return this.initializeClient();
+        return this.initializeClient()
     }
 
     public async getAppOnlyTokenAsync(): Promise<string> {
@@ -55,4 +53,4 @@ class MicrosoftAuth {
     }
 }
 
-export default MicrosoftAuth
+export default GraphApiClient

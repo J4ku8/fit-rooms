@@ -18,14 +18,16 @@ export class KosApiClient extends CvutApiHandler{
             console.log(e)
         }
     }
-
-    private _extractParallels = async (dataset: any) => {
-        try {
-            return await this._filterEventsByRooms(dataset)
-        }catch (e) {
-
+    private _getAvailableRooms = async () => {
+        try{
+            return await Room.find({})
+        }catch (error: any) {
+            console.log(`Error at reading from DB getAvailableRooms::`, error?.message)
+            return null
         }
+
     }
+
     getSemester = async (): Promise<SemesterSchema | null> => {
         try {
             const today = new Date();
@@ -69,22 +71,12 @@ export class KosApiClient extends CvutApiHandler{
             return null;
         }
     }
-
-    getAvailableRooms = async () => {
-        try{
-            return await Room.find({})
-        }catch (error: any) {
-            console.log(`Error at reading from DB getAvailableRooms::`, error?.message)
-            return null
-        }
-
-    }
     getParallels = async (semester: string = "B231") => {
         try {
-            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (timetableSlot/room.code==TH:B-378,timetableSlot/room.code==T9:602)`})
-            console.log(res[0])
-            console.log(res.length)
-            return await this._extractParallels(res)
+            const rooms = await this._getAvailableRooms()
+            const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
+            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`})
+            return res?.map(parallel => parallel?.content)
         } catch (error: any) {
             // Handle errors
             console.error('Error making API call getParallels::', error?.message);

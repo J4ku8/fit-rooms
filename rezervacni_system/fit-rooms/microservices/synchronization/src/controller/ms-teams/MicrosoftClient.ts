@@ -1,4 +1,4 @@
-import { AppSettings } from '../../utils/types';
+import {AppSettings} from '../../utils/types';
 import MicrosoftAuth from "../../midleware/auth/MicrosoftAuth";
 import config from "../../config/config";
 import {Client} from "@microsoft/microsoft-graph-client";
@@ -25,8 +25,8 @@ class GraphTutorial {
                 .top(25)
                 .orderby('displayName')
                 .get();
-            console.log(rooms.value);
-            return rooms.value
+            // @ts-ignore
+            return rooms.value.map(({id, ...rest}) => ({roomId: id, ...rest}))
         } catch (err) {
             console.log(`Error getting users: ${err}`);
         }

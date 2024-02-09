@@ -8,16 +8,11 @@ import {formatDate, isRunningEvent} from "../../utils/time-helper";
 import Timer from "../Timer";
 import EventList from "../Event/EventList";
 
-const Room = ({ id }: { id: string }) => {
+const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
     const { color, setRoomStatus, isRoomFree } = useGlobalContext()
     const theme = useTheme()
-    // const roomEvents = useGetEvents(id)
-    // const graphApiClient =  useMicrosoftAuth({
-    //     tenantId: process.env.TENANT_ID_MS || "",
-    //     clientId: "",
-    //     clientSecret: "",
-    //     graphUserScopes: ["user.read"]
-    // })
+    const { data: { value } } = useGetEvents({roomEmail})
+    console.log(value)
     const roomEvents = sampleEventsData
 
     const currentEvent = roomEvents.find(event => isRunningEvent(new Date(event.from), new Date(event.to)))
@@ -35,10 +30,10 @@ const Room = ({ id }: { id: string }) => {
             <Box display="flex" flexDirection="row" height="80%">
                 <Box mr={4} p={2} display="flex" width="75%" flexDirection="row" justifyContent="space-between">
                     <Box display="flex" flexDirection="column" gap={2}>
-                        <Typography variant="h3">{id}</Typography>
+                        <Typography variant="h3">{name}</Typography>
                         <Box display="flex" flexDirection="column" gap={0.5} px={3}>
                             <Typography variant="subtitle1">Room timetable</Typography>
-                            <QRCode value={`https://timetable.fit.cvut.cz/new/rooms/${id}`}  size={192}/>
+                            <QRCode value={`https://timetable.fit.cvut.cz/new/rooms/${name}`}  size={192}/>
                         </Box>
                     </Box>
                     <Box py={1} display="flex" flexDirection="column" gap={4}>
