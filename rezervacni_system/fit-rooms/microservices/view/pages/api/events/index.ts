@@ -24,15 +24,13 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
         const microsoftAuth = new GraphApiClient(settings)
         const client = microsoftAuth.initializeGraphForAppOnlyAuth()
         const events = await client?.api(`/users/${roomEmail}/calendar/events`)
+            .header('Prefer','outlook.timezone="Central Europe Standard Time"')
+            .filter('start/dateTime ge \'2024-02-11T00:00:00Z\' and end/dateTime le \'2024-02-11T23:59:59Z\'')
+            .orderby('start/dateTime')
             .get();
-        // @ts-ignore
-        const filteredEvents = events.value?.filter(event => {
-            if(isToday(new Date(event?.start?.dateTime)) || REQURENCE_PATTERN_TYPES_ARRAY.includes(event.recurrence?.pattern?.type)){
-                // TODO: verify that today is day in week/month/year, which it is schedulled
-                return event
-            }
-        })
-        console.log(filteredEvents?.length)
+
+
+
         res.status(200).json(events.value)
 
     } catch (err: any) {
