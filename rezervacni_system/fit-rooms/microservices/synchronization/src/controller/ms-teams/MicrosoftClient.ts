@@ -77,7 +77,7 @@ class GraphTutorial {
         };
         const events = await this.client.api(`/users/${roomEmail}/calendar/events`)
             .post(event);
-
+    //     TODO: Parse KOS events to MS format. Iterate events, to find conflicts, if conflict, delete event from MS and replace with KOS.
     }
     public async deleteEvent(eventId: string): Promise<void> {
         // TODO
