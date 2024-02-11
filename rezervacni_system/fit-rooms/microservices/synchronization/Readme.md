@@ -1,35 +1,14 @@
-project/
-|-- microservices/
-|   |-- service1/
-|   |   |-- models/
-|   |   |-- views/
-|   |   |-- controllers/
-|   |   |-- services/          (Pro synchronizaci mezi službami)
-|   |   |-- routes/            (Pro routování HTTP požadavků)
-|   |   |-- tests/             (Jednotkové a integrační testy)
-|   |
-|   |-- service2/
-|   |   |-- models/
-|   |   |-- views/
-|   |   |-- controllers/
-|   |   |-- services/
-|   |   |-- routes/
-|   |   |-- tests/
-|
-|-- shared/
-|   |-- models/                 (Společné modely, pokud existují)
-|   |-- utils/                  (Společné utility a nástroje)
-|
-|-- frontend/
-|   |-- static/                 (Statické soubory pro frontend)
-|   |-- templates/              (HTML šablony pro vykreslování stránek)
-|   |-- controllers/            (Kontroléry pro frontend, pokud jsou potřebné)
-|   |-- tests/                  (Testy pro frontend)
-|
-|-- config/                     (Konfigurace projektu)
-|-- scripts/                    (Skripty pro nasazení, migrace dat, atd.)
-|-- docs/                       (Dokumentace projektu)
-|-- tests/                      (Obecné testy, testy pro middleware, atd.)
-|-- .gitignore                  (Soubor pro ignorování souborů v Gitu)
-|-- package.json                (Konfigurace Node.js projektu)
-|-- app.js                      (Vstupní bod pro spuštění aplikace)
+## Synchronization service
+
+This service is for synchronization of KOS service with Microsoft's Graph API.
+
+Before first run, you need to have running MongoDB. This DB should be build from docker image. 
+
+For local development run: `yarn install & yarn start`
+
+Project structure: <br>
+`/config` – Config folder stands for keeping all .env constants <br> 
+`/controller` – In controller folder is handled direct comunication with external services: KOSapi, Graph API <br>
+`/db` – In db folder are stored MongoDB models, in model subfolder. In index.ts in db connector. <br>
+`/middleware` – Middleware folder is keeping all significant features, like oauth, crons, synchronization process, etc. <br>
+`/utils` – Utils folder is there for all simple operations, which are used in bigger scope.  <br>
