@@ -1,11 +1,13 @@
 import cron from 'node-cron';
 import {currentTime, isoToCron} from "../../utils/time-handler";
-import {Client} from "@microsoft/microsoft-graph-client";
 import GraphTutorial from "../../controller/ms-teams/MicrosoftClient";
 import Room from "../../db/model/room";
+import {parseCvutData} from "../synchronization";
 
 // parallels, courseEvents
-const kosSync = cron.schedule('*/30 * * * *', () => {
+const kosSync = (semesterStart: Date, semesterEnd: Date) => cron.schedule('*/30 * * * *', () => {
+    console.log(semesterStart, semesterEnd)
+    parseCvutData([{}], {semesterStart, semesterEnd})
     console.log(currentTime(), 'Tato funkce se spustí každou půl hodinu');
 });
 
@@ -25,13 +27,13 @@ const roomSync = (client: GraphTutorial) => cron.schedule('*/5 * * * *', async (
     }));
 
     Room.bulkWrite(bulkOps)
-        .then(result => console.log(result))
-        .catch(error => console.error('Error at writing record to DB:', error));
+        .then((result: any) => console.log(result))
+        .catch((error: any) => console.error('Error at writing record to DB:', error));
 })
 
-const initCrons = (semesterTriggerTime: Date, graphClient: GraphTutorial) => {
-    const cronDate = isoToCron(semesterTriggerTime)
-    kosSync.start();
+const initCrons = (semesterEnd: Date, semesterStart: Date, graphClient: GraphTutorial) => {
+    const cronDate = isoToCron(semesterEnd)
+    kosSync(semesterStart, semesterEnd).start();
     semesterTask(cronDate).start();
     roomSync(graphClient).start
 }

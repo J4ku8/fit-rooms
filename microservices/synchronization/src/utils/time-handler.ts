@@ -25,3 +25,11 @@ export const currentTime = () => {
     const currentSecond = currentDate.getSeconds();
     return `${currentYear}-${currentMonth}-${currentDay} ${currentHour}:${currentMinute}:${currentSecond}`
 }
+
+export const findDayFromDate = (from: Date, dayOfTheWeek: number) => {
+    const d = new Date(dayOfTheWeek);
+    const actualDay = d.getDay();
+    const diff = (dayOfTheWeek - actualDay + 7) % 7;
+    d.setDate(d.getDate() + diff);
+    return d;
+}

@@ -2,10 +2,10 @@ import {useQuery} from "react-query";
 import {GraphApiFetch} from "../types";
 
 
-export const useGetEvents = ({ roomEmail }: GraphApiFetch) => {
-    return useQuery(['events', roomEmail], async () => {
+export const useGetCalendar = ({ roomEmail }: GraphApiFetch) => {
+    return useQuery(['calendar', roomEmail], async () => {
         try {
-            const response = await fetch(`/api/events?roomEmail=${roomEmail}`);
+            const response = await fetch(`/api/calendar?roomEmail=${roomEmail}`);
             if (!response.ok) {
                 return []
             }

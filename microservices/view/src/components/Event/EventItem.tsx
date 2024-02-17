@@ -8,14 +8,14 @@ type Props = {
     data: Event
 }
 
-const EventItem = ({ data }: Props) => {
+const EventItem = ({ data }: any) => {
     const theme = useTheme()
     return (
         <Box my={1.5} px={0.5} display="flex" flexDirection="column" style={{ borderLeft: `4px solid ${theme.palette.primary.main}`, borderRadius: "3px 0 0 3px"}}>
-            <Typography variant="subtitle1" fontWeight="600" fontSize="18px">{data.name}</Typography>
+            <Typography variant="subtitle1" fontWeight="600" fontSize="18px">{data.subject}</Typography>
             <Box display="flex" flexDirection="row">
                 <Typography
-                    variant="subtitle1">{`${formatDate(new Date(data.from), false)} – ${formatDate(new Date(data.to), false)}`}</Typography>
+                    variant="subtitle1">{`${formatDate(new Date(data.start.dateTime), false)} – ${formatDate(new Date(data.end.dateTime), false)}`}</Typography>
             </Box>
         </Box>
     );

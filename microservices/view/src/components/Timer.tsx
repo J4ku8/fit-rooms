@@ -2,26 +2,29 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Typography} from "@mui/material";
 import {useGlobalContext} from "../context/GlobalContext";
 import { Event } from '../types'
-import {formatDate} from "../utils/time-helper";
+import {formatDate, getCurrentDate} from "../utils/time-helper";
 
 
-const Timer: React.FC<{ event?: Event }> = ({ event })=> {
+const Timer: React.FC<{ event?: any }> = ({ event })=> {
     const { isRoomFree } = useGlobalContext()
     const [currentTime, setCurrentTime] = useState<string>("")
     if(!event){
         return null
     }
+
     const updateClock = useCallback(() => {
+        const now = getCurrentDate().getTime()
+        console.log(isRoomFree)
         if(isRoomFree){
-            const nextEventTime = new Date(event.from).getTime()
-            const now = new Date().getTime()
+            const nextEventTime = new Date(event.start.dateTime).getTime()
             setCurrentTime(formatDate(new Date(nextEventTime - now), true));
         }else {
-            const nextEventTime = new Date(event.to).getTime()
-            const now = new Date().getTime()
-            setCurrentTime(formatDate(new Date(nextEventTime - now), true));
+            const currentEventEndTime = new Date(event.end.dateTime).getTime()
+            const dateDifference = new Date(0);
+            dateDifference.setMilliseconds((currentEventEndTime - 3600000) - now );
+            setCurrentTime(formatDate(new Date(dateDifference), true));
         }
-    }, []);
+    }, [isRoomFree]);
 
     useEffect(() => {
         updateClock();

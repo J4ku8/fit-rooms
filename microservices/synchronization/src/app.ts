@@ -4,7 +4,6 @@ import bodyParser from "body-parser";
 import initCrons from "./midleware/cron";
 import {KosApiClient} from "./controller/cvut-kos/KosClient";
 import connect from "./db";
-import mongoose from "mongoose";
 import {TokenManager} from "./midleware/auth/TokenManager";
 import MicrosoftClient from "./controller/ms-teams/MicrosoftClient";
 import Room from "./db/model/room";
@@ -25,7 +24,7 @@ const koc_client = new KosApiClient();
     // const rooms = await microsoft_client.roomEvents()
     // console.log("parallels", parallels)
 
-    initCrons(semester?.to!, microsoft_client)
+    initCrons(semester?.to!, semester?.from!, microsoft_client)
 })();
 
 export default app;
