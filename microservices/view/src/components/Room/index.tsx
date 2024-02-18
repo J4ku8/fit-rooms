@@ -27,6 +27,7 @@ const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
         }
         return event
     })
+
     useEffect(() => {
         setRoomStatus(!currentEvent)
     }, [currentEvent, events]);

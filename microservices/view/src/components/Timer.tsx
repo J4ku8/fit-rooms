@@ -14,7 +14,6 @@ const Timer: React.FC<{ event?: any }> = ({ event })=> {
 
     const updateClock = useCallback(() => {
         const now = getCurrentDate().getTime()
-        console.log(isRoomFree)
         if(isRoomFree){
             const nextEventTime = new Date(event.start.dateTime).getTime()
             setCurrentTime(formatDate(new Date(nextEventTime - now), true));
