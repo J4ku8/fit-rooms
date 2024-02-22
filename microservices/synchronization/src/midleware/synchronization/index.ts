@@ -1,36 +1,44 @@
-// Funkce pro vytvoření události
-const  createEvent = (parallel: any) => {
+import {BOTH, days, EVEN, ODD} from "../../utils/constants";
+import {assignTimeToDate} from "../../utils/time-handler";
+
+
+
+const  createEvent = (parallel: any, semesterStart: Date, semesterEnd: Date) => {
+    const { parity, startTime, day, endTime } = parallel.timetableSlot;
+    const startDay = [BOTH, ODD].includes(parity) ? semesterStart : new Date(semesterStart.setDate(semesterStart.getDate() + 7))
+    const endDay = [BOTH, EVEN].includes(parity) ? semesterEnd : new Date(semesterEnd.setDate(semesterStart.getDate() - 7))
     const event = {
         subject: parallel.course["_"],
         body: {
             contentType: 'HTML',
-            content: 'Does noon time work for you?'
+            content: parallel.course["_"]
         },
         start: {
-            dateTime: new Date(parallel.timetableSlot.startTime).toISOString(),
+            dateTime: assignTimeToDate(startDay, startTime).toISOString(),
             timeZone: "Central Europe Time"
         },
         end: {
-            dateTime: new Date(parallel.timetableSlot.startTime).toISOString(),
+            dateTime: assignTimeToDate(endDay, endTime).toISOString(),
             timeZone: "Central Europe Time"
         },
         recurrence: {
             pattern: {
                 type: "weekly",
-                interval: 1,
-                daysOfWeek: ["Monday"]
+                interval: parity === BOTH ? 1 : 2,
+                daysOfWeek: days[Number(day)],
+                firstDayOfWeek: days[0]
             },
             range: {
                 type: "endDate",
-                startDate: "",
-                endDate: ""
+                startDate: startDay,
+                endDate: endDay
             }
         },
         attendees: [
             {
                 emailAddress: {
-                    address: 'room email',
-                    name: 'room name'
+                    address: 'th_a_1444@x2h3h.onmicrosoft.com',
+                    name: 'TH:A-1444'
                 },
                 type: 'required'
             }
@@ -40,9 +48,9 @@ const  createEvent = (parallel: any) => {
     return event;
 }
 
-export const parseCvutData = (data: any, { semesterStart, semesterEnd }: { semesterStart: Date, semesterEnd: Date  }) => {
+export const parseCvutData = ({ semesterStart, semesterEnd }: { semesterStart: Date, semesterEnd: Date  }, data?: any) => {
     const event = {
-        subject: 'Let\'s go for lunch',
+        subject: 'Service meet',
         body: {
             contentType: 'HTML',
             content: 'Does noon time work for you?'
@@ -96,5 +104,6 @@ export const parseCvutData = (data: any, { semesterStart, semesterEnd }: { semes
     // TODO: find first and last occurence of event in semester -> save to range object in MS event, even/odd week is defined by interval
     const mockParallel = [parallel]
     const mockEvents = [event]
-    const events = mockParallel.map(parallel => createEvent(parallel))
+    const events = mockParallel.map(parallel => createEvent(parallel, semesterStart, semesterEnd))
+    return events
 }

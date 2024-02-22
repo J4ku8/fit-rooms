@@ -14,6 +14,7 @@ const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
     const theme = useTheme()
     const { data } = useGetEvents({roomEmail})
     // const celendar = useGetCalendar({roomEmail})
+    console.log(data)
     const styles = { backgroundColor: color,...{ style } }
     const currentEvent = data?.find((event: any) => event.isAllDay || isRunningEvent(new Date(event.start.dateTime), new Date(event.end.dateTime)))
     const events = data?.filter((event: any) => {

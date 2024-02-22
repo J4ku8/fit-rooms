@@ -2,15 +2,13 @@ import { Document, Model } from 'mongoose';
 
 
 export enum KosApiRoutes {
-    DIVISION =  "/rooms",
     SEMESTER = "/semesters",
     PARALLELS = "/parallels",
     COURSE_EVENT = "/courseEvents",
-    TEACHERS = "/teachers"
+    EXAMS = "/exams",
 }
 
 export enum ApiProviders {
-    TEAMS = "/teams",
     KOS_API = "https://kosapi.fit.cvut.cz/api/3"
 }
 

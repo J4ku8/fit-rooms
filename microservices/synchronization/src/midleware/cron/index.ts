@@ -7,7 +7,7 @@ import {parseCvutData} from "../synchronization";
 // parallels, courseEvents
 const kosSync = (semesterStart: Date, semesterEnd: Date) => cron.schedule('*/30 * * * *', () => {
     console.log(semesterStart, semesterEnd)
-    parseCvutData([{}], {semesterStart, semesterEnd})
+    parseCvutData( {semesterStart, semesterEnd})
     console.log(currentTime(), 'Tato funkce se spustí každou půl hodinu');
 });
 

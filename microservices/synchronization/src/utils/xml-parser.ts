@@ -20,7 +20,13 @@ const removeAtomPrefix = (arr: AtomlessObject[] | AtomlessObject): any => {
     if(Array.isArray(arr)){
         return arr?.map(obj => removeAtom(obj))
     }else {
-        return removeAtom(arr)
+
+        const result = removeAtom(arr)
+        const isEmptyObject = Object.keys(result).length === 0
+        if (isEmptyObject){
+            return []
+        }
+        return result
     }
 };
 

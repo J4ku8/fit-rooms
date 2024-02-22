@@ -33,3 +33,12 @@ export const findDayFromDate = (from: Date, dayOfTheWeek: number) => {
     d.setDate(d.getDate() + diff);
     return d;
 }
+
+export const assignTimeToDate = (date: Date, time: string): Date => {
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(seconds);
+
+    return date
+}
