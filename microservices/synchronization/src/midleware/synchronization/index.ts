@@ -1,109 +1,82 @@
-import {BOTH, days, EVEN, ODD} from "../../utils/constants";
+import {BOTH, EVEN, ODD, WEEKS_OF_LECTURES} from "../../utils/constants";
 import {assignTimeToDate} from "../../utils/time-handler";
+import Room from "../../db/model/room";
 
 
-
-const  createEvent = (parallel: any, semesterStart: Date, semesterEnd: Date) => {
-    const { parity, startTime, day, endTime } = parallel.timetableSlot;
+const createParallelEvent = async (parallel: any, semesterStart: Date, semesterEnd: Date) => {
+    const { parity, startTime, day, endTime, room } = parallel.timetableSlot;
     const startDay = [BOTH, ODD].includes(parity) ? semesterStart : new Date(semesterStart.setDate(semesterStart.getDate() + 7))
     const endDay = [BOTH, EVEN].includes(parity) ? semesterEnd : new Date(semesterEnd.setDate(semesterStart.getDate() - 7))
-    const event = {
-        subject: parallel.course["_"],
-        body: {
-            contentType: 'HTML',
-            content: parallel.course["_"]
-        },
-        start: {
-            dateTime: assignTimeToDate(startDay, startTime).toISOString(),
-            timeZone: "Central Europe Time"
-        },
-        end: {
-            dateTime: assignTimeToDate(endDay, endTime).toISOString(),
-            timeZone: "Central Europe Time"
-        },
-        recurrence: {
-            pattern: {
-                type: "weekly",
-                interval: parity === BOTH ? 1 : 2,
-                daysOfWeek: days[Number(day)],
-                firstDayOfWeek: days[0]
+    let week = 1
+    const events = []
+    const roomName = room["_"]
+    const roomFromDb = await Room.findOne({ displayName: roomName });
+    if(!roomFromDb){
+        return []
+    }
+    while(week <= WEEKS_OF_LECTURES){
+        const isWeekOdd = week % 2
+        if(parity === ODD && !isWeekOdd){
+            week +=1;
+            continue
+        }
+        if(parity === EVEN && isWeekOdd){
+            week +=1;
+            continue
+        }
+        const helperDate = new Date(startDay)
+        const eventDateStart = new Date(helperDate.setDate(semesterStart.getDate() + (7 * week)))
+        const event = {
+            subject: parallel.course["_"],
+            body: {
+                contentType: 'HTML',
+                content: parallel.course["_"]
             },
-            range: {
-                type: "endDate",
-                startDate: startDay,
-                endDate: endDay
-            }
-        },
-        attendees: [
-            {
-                emailAddress: {
-                    address: 'th_a_1444@x2h3h.onmicrosoft.com',
-                    name: 'TH:A-1444'
-                },
-                type: 'required'
-            }
-        ]
-    };
+            location: {
+                displayName: roomName
+            },
+            start: {
+                dateTime: assignTimeToDate(eventDateStart, startTime).toISOString(),
+                timeZone: "Central Europe Standard Time"
+            },
+            end: {
+                dateTime: assignTimeToDate(eventDateStart, endTime).toISOString(),
+                timeZone: "Central Europe Standard Time"
+            },
+            // recurrence: {
+            //     pattern: {
+            //         type: "weekly",
+            //         interval: parity === BOTH ? 1 : 2,
+            //         daysOfWeek:[ days[Number(day)]],
+            //         firstDayOfWeek: days[0]
+            //     },
+            //     range: {
+            //         type: "endDate",
+            //         startDate: getYearMonthDay(startDay),
+            //         endDate: getYearMonthDay(endDay)
+            //     }
+            // },
+            attendees: [
+                {
+                    emailAddress: {
+                        address: roomFromDb?.emailAddress,
+                        name: roomName
+                    },
+                    type: 'required'
+                }
+            ],
+        };
 
-    return event;
+
+        events.push(event)
+        week += 1
+    }
+
+    return events;
 }
 
-export const parseCvutData = ({ semesterStart, semesterEnd }: { semesterStart: Date, semesterEnd: Date  }, data?: any) => {
-    const event = {
-        subject: 'Service meet',
-        body: {
-            contentType: 'HTML',
-            content: 'Does noon time work for you?'
-        },
-        start: {
-            dateTime: '2017-09-04T12:00:00',
-            timeZone: 'Pacific Standard Time'
-        },
-        end: {
-            dateTime: '2017-09-04T14:00:00',
-            timeZone: 'Pacific Standard Time'
-        },
-        recurrence: {
-            pattern: {
-                type: 'weekly',
-                interval: 1,
-                daysOfWeek: [ 'Monday' ]
-            },
-            range: {
-                type: 'endDate',
-                startDate: '2017-09-04',
-                endDate: '2017-12-31'
-            }
-        },
-        location: {
-            displayName: 'Harry\'s Bar'
-        },
-        allowNewTimeProposals: true
-    };
-    const parallel = {
-        type: 'xml',
-        'xsi:type': 'parallel',
-        capacity: '24',
-        code: '1',
-        course: { _: 'Grid Computing', 'xlink:href': 'courses/NI-GRI/' },
-        occupied: '5',
-        parallelType: 'LECTURE',
-        semester: { _: 'Zimní 2023/2024', 'xlink:href': 'semesters/B231/' },
-        teacher: { _: 'doc. Dr. André Sopczak', 'xlink:href': 'teachers/sopczand/' },
-        timetableSlot: {
-            id: '1246702568305',
-            day: '4',
-            duration: '2',
-            endTime: '14:15:00',
-            firstHour: '7',
-            parity: 'BOTH',
-            startTime: '12:45:00',
-            room: [Object]
-        }
-    }
-    // TODO: find first and last occurence of event in semester -> save to range object in MS event, even/odd week is defined by interval
-    const mockParallel = [parallel]
-    const mockEvents = [event]
-    const events = mockParallel.map(parallel => createEvent(parallel, semesterStart, semesterEnd))
-    return events
+export const parseCvutData = async ({ semesterStart, semesterEnd, data }: { semesterStart: Date, semesterEnd: Date, data: any  }) => {
+
+    // @ts-ignore
+    return await Promise.all(data.map(parallel => createParallelEvent(parallel, semesterStart, semesterEnd)))
 }

@@ -35,7 +35,6 @@ class GraphTutorial {
         try {
             const events = await this.client.api(`/users/${roomEmail}/calendar/events`)
                 .get();
-            console.log(events.value);
             return events.value
         } catch (err) {
             console.log(`Error getting users: ${err}`);
@@ -46,41 +45,16 @@ class GraphTutorial {
         // TODO
     }
 
-    public async createEvent(roomEmail: string): Promise<void> {
-        const event = {
-            subject: 'Let\'s go for lunch',
-            body: {
-                contentType: 'HTML',
-                content: 'Does mid month work for you?'
-            },
-            start: {
-                dateTime: '2019-03-15T12:00:00',
-                timeZone: 'Pacific Standard Time'
-            },
-            end: {
-                dateTime: '2019-03-15T14:00:00',
-                timeZone: 'Pacific Standard Time'
-            },
-            location: {
-                displayName: 'Harry\'s Bar'
-            },
-            attendees: [
-                {
-                    emailAddress: {
-                        address: 'adelev@contoso.onmicrosoft.com',
-                        name: 'Adele Vance'
-                    },
-                    type: 'required'
-                }
-            ],
-            transactionId: '7E163156-7762-4BEB-A1C6-729EA81755A7'
-        };
-        const events = await this.client.api(`/users/${roomEmail}/calendar/events`)
+    public async createEvent({roomEmail, event}: {roomEmail: string, event: any}): Promise<void> {
+
+        const res = await this.client.api(`/users/${roomEmail}/calendar/events`)
             .post(event);
-    //     TODO: Parse KOS events to MS format. Iterate events, to find conflicts, if conflict, delete event from MS and replace with KOS.
+        console.log(res)
     }
-    public async deleteEvent(eventId: string): Promise<void> {
-        // TODO
+    public async deleteEvent({roomEmail, eventId}: {roomEmail: string, eventId: any}): Promise<void> {
+        const res = await this.client.api(`/users/${roomEmail}/calendar/events/${eventId}`)
+            .delete();
+        return res
     }
 
     public async updateEvent(eventId: string): Promise<void> {

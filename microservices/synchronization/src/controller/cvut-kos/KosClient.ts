@@ -8,8 +8,9 @@ export class KosApiClient extends CvutApiHandler{
 
     private _filterEventsByRooms = async (events: any) => {
         const rooms = await Room.find({})
+        return events
         // @ts-ignore
-        return events?.filter(event => event?.content?.room && rooms.some(room => room.name === event?.content?.room["_"] || event?.content?.note && room.name ===event?.content?.note["_"]))
+        // return events?.filter(event => event?.content?.room && rooms.some(room => room.displayName === event?.content?.room["_"] || event?.content?.note && room.displayName === event?.content?.note["_"]))
     }
     private _extractCourseEvents = async (dataset: any) => {
         try{
@@ -73,7 +74,7 @@ export class KosApiClient extends CvutApiHandler{
             return { from: now, to: endOfSemester, name: ""};
         }
     }
-    getParallels = async (semester: string = "B231") => {
+    getParallels = async (semester: string) => {
         try {
             const rooms = await this._getAvailableRooms()
             const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
@@ -86,23 +87,22 @@ export class KosApiClient extends CvutApiHandler{
         }
     }
 
-    getExams = async (semester: string = "B231") => {
+    getExams = async (semester: string) => {
         try {
             const rooms = await this._getAvailableRooms()
             const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
-            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`})
+            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`})
             return res?.map(parallel => parallel?.content)
         } catch (error: any) {
             // Handle errors
-            console.error('Error making API call getParallels::', error?.message);
+            console.error('Error making API call getExams::', error?.message);
             return null;
         }
     }
 
-    getCourseEvent = async (semester: string = "B231") => {
+    getCourseEvent = async (semester: string) => {
         try {
             const dataset = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.COURSE_EVENT}?limit=1000&query=semester==${semester}`})
-
             return await this._extractCourseEvents(dataset)
         } catch (error: any) {
             // Handle errors
