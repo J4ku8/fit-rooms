@@ -43,19 +43,6 @@ const createParallelEvent = async (parallel: any, semesterStart: Date, semesterE
                 dateTime: assignTimeToDate(eventDateStart, endTime).toISOString(),
                 timeZone: "Central Europe Standard Time"
             },
-            // recurrence: {
-            //     pattern: {
-            //         type: "weekly",
-            //         interval: parity === BOTH ? 1 : 2,
-            //         daysOfWeek:[ days[Number(day)]],
-            //         firstDayOfWeek: days[0]
-            //     },
-            //     range: {
-            //         type: "endDate",
-            //         startDate: getYearMonthDay(startDay),
-            //         endDate: getYearMonthDay(endDay)
-            //     }
-            // },
             attendees: [
                 {
                     emailAddress: {
@@ -75,8 +62,90 @@ const createParallelEvent = async (parallel: any, semesterStart: Date, semesterE
     return events;
 }
 
-export const parseCvutData = async ({ semesterStart, semesterEnd, data }: { semesterStart: Date, semesterEnd: Date, data: any  }) => {
+const createExamEvent = async (exam: any) => {
+    const { course, room, startDate, endDate } = exam;
+    const roomName = room["_"]
+    const roomFromDb = await Room.findOne({ displayName: roomName });
+    return {
+        subject: `Exam - ${course["_"]}`,
+        body: {
+            contentType: 'HTML',
+            content: course["_"]
+        },
+        location: {
+            displayName: roomName
+        },
+        start: {
+            dateTime: startDate,
+            timeZone: "Central Europe Standard Time"
+        },
+        end: {
+            dateTime: endDate,
+            timeZone: "Central Europe Standard Time"
+        },
+        attendees: [
+            {
+                emailAddress: {
+                    address: roomFromDb?.emailAddress,
+                    name: roomName
+                },
+                type: 'required'
+            }
+        ],
+    };
+
+}
+
+const createCourseEvent = async (event: any) => {
+    const { title, content } = event
+    const roomName =  content?.room["_"] || content?.note["_"]
+    if(!roomName){
+        return
+    }
+    const roomFromDb = await Room.findOne({ displayName: roomName });
+
+    return {
+        subject: title,
+        body: {
+            contentType: 'HTML',
+            content: title
+        },
+        location: {
+            displayName: roomName
+        },
+        start: {
+            dateTime: content.startDate,
+            timeZone: "Central Europe Standard Time"
+        },
+        end: {
+            dateTime: content.endDate,
+            timeZone: "Central Europe Standard Time"
+        },
+        attendees: [
+            {
+                emailAddress: {
+                    address: roomFromDb?.emailAddress,
+                    name: roomName
+                },
+                type: 'required'
+            }
+        ],
+    };
+
+}
+
+export const parseParrallels = async ({ semesterStart, semesterEnd, data }: { semesterStart: Date, semesterEnd: Date, data: any  }) => {
 
     // @ts-ignore
     return await Promise.all(data.map(parallel => createParallelEvent(parallel, semesterStart, semesterEnd)))
+}
+
+export const parseExams = async (data: any) => {
+    // @ts-ignore
+    return await Promise.all(data.map(exam => createExamEvent(exam)))
+}
+
+export const parseCourseEvents = async (data: any) => {
+    // @ts-ignore
+    return await Promise.all(data?.map(event => createCourseEvent(event))?.filter(value => value !== null))
 }

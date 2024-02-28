@@ -8,9 +8,8 @@ export class KosApiClient extends CvutApiHandler{
 
     private _filterEventsByRooms = async (events: any) => {
         const rooms = await Room.find({})
-        return events
         // @ts-ignore
-        // return events?.filter(event => event?.content?.room && rooms.some(room => room.displayName === event?.content?.room["_"] || event?.content?.note && room.displayName === event?.content?.note["_"]))
+        return events?.filter(event => event?.content?.room && rooms.some(room => room.displayName === event?.content?.room["_"] || event?.content?.note && room.displayName === event?.content?.note["_"]))
     }
     private _extractCourseEvents = async (dataset: any) => {
         try{
@@ -91,7 +90,8 @@ export class KosApiClient extends CvutApiHandler{
         try {
             const rooms = await this._getAvailableRooms()
             const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
-            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`})
+            //  and (${queryString})
+            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?limit=${LIMIT}&offset=0&query=semester==${semester}`})
             return res?.map(parallel => parallel?.content)
         } catch (error: any) {
             // Handle errors
