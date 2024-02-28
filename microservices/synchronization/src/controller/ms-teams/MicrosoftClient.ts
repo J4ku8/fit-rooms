@@ -41,10 +41,6 @@ class GraphTutorial {
         }
     }
 
-    private async getEvent(): Promise<void> {
-        // TODO
-    }
-
     public async createEvent({roomEmail, event}: {roomEmail: string, event: any}): Promise<void> {
 
         const res = await this.client.api(`/users/${roomEmail}/calendar/events`)
@@ -55,10 +51,6 @@ class GraphTutorial {
         const res = await this.client.api(`/users/${roomEmail}/calendar/events/${eventId}`)
             .delete();
         return res
-    }
-
-    public async updateEvent(eventId: string): Promise<void> {
-        // TODO
     }
 
 
