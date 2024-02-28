@@ -36,7 +36,7 @@ const kos_client = new KosApiClient();
     //     microsoft_client.deleteEvent({ roomEmail: events[0].attendees[0].emailAddress.address, eventId: item.id})
     // })
 
-    // initCrons(semester?.to!, semester?.from!, microsoft_client, microsoftParralels, microsoftExams, microsoftCourseEvents)
+    // initCrons(kos_client, microsoft_client)
 })();
 
 export default app;
