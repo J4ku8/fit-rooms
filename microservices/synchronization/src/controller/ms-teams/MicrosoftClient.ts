@@ -12,7 +12,7 @@ const settings: AppSettings = {
 
 const microsoftAuth = new MicrosoftAuth(settings)
 
-class GraphTutorial {
+class MicrosoftClient {
     // @ts-ignore
     public client: Client;
     constructor() {
@@ -42,10 +42,8 @@ class GraphTutorial {
     }
 
     public async createEvent({roomEmail, event}: {roomEmail: string, event: any}): Promise<void> {
-
-        const res = await this.client.api(`/users/${roomEmail}/calendar/events`)
+        await this.client.api(`/users/${roomEmail}/calendar/events`)
             .post(event);
-        console.log(res)
     }
     public async deleteEvent({roomEmail, eventId}: {roomEmail: string, eventId: any}): Promise<void> {
         const res = await this.client.api(`/users/${roomEmail}/calendar/events/${eventId}`)
@@ -53,7 +51,32 @@ class GraphTutorial {
         return res
     }
 
+    public async sendEmail({roomId, recipients, content}: {roomId: string, recipients?: any, content: string}){
+        const email = {
+            message: {
+                subject: 'Conflict with KOS meeting',
+                body: {
+                    contentType: 'Text',
+                    content: content
+                },
+                // recipients
+                toRecipients: [
+                    {
+                        emailAddress: {
+                            address: recipients
+                        }
+                    }
+                ],
 
+            },
+            saveToSentItems: 'false'
+        };
+        console.log("sending...")
+       const res = await this.client.api(`/users/${roomId}/sendMail`)
+            .post(email);
+
+       console.log(res)
+    }
 
 }
-export default GraphTutorial
+export default MicrosoftClient

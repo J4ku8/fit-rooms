@@ -62,7 +62,6 @@ export class KosApiClient extends CvutApiHandler{
                     .catch((error) => {
                         console.error('Chyba při vkládání záznamu:', error);
                     });
-
                 return newSemester
             }
         } catch (error: any) {

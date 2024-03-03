@@ -68,3 +68,37 @@ export type SemesterSchema = {
 }
 export interface SemesterDocument extends SemesterSchema, Document {}
 
+type Attendee = {
+    emailAddress: {
+        address: string;
+        name: string;
+    };
+    type: string;
+}
+
+type Location = {
+    displayName: string;
+}
+
+export type Event = {
+    subject: string;
+    id?: string;
+    body: {
+        contentType: string;
+        content: string;
+    };
+    location: Location;
+    locations?: Array<Location>
+    start: {
+        dateTime: string;
+        timeZone: string;
+    };
+    end: {
+        dateTime: string;
+        timeZone: string;
+    };
+    attendees: Array<Attendee>;
+};
+
+
+export type Conflict = Array<{ current: Event; newEvent: Event; roomId: string }>

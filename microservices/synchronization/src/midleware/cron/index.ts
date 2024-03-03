@@ -24,10 +24,9 @@ const kosSync = (graphClient: MicrosoftClient, kosClient: KosApiClient, semester
     timezone: "Europe/Prague"
 });
 
-// semester, then to DB -> schedule cron to start/end of semester
-const semesterTask = (semesterTime: string, kos_client: KosApiClient) => cron.schedule(semesterTime, async () => {
+
+const semesterTask = (kos_client: KosApiClient) => cron.schedule('0 3 * * *', async () => {
     return await kos_client.getSemester()
-    console.log('Tato funkce se spustí začátkem semestru');
 }, {
     scheduled: true,
     timezone: "Europe/Prague"
@@ -52,12 +51,11 @@ const roomSync = (client: MicrosoftClient) => cron.schedule('*/5 * * * *', async
 })
 
 const initCrons = async (kos_client: KosApiClient, graphClient: MicrosoftClient) => {
-    const semester = await kos_client.getSemester()
-    const cronDate = isoToCron(semester?.to)
-    // TODO: handle that semester will be re-fetch, when it is needed
+    let semester = await kos_client.getSemester()
     kosSync(graphClient, kos_client, semester).start();
-    semesterTask(cronDate, kos_client).start();
+    semesterTask(kos_client).start();
     roomSync(graphClient).start();
+
 
 }
 
