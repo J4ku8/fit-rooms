@@ -1,64 +1,21 @@
-import {BOTH, days, EVEN, ODD, WEEKS_OF_LECTURES} from "../../utils/constants";
+import {BOTH, days, EVEN, ODD} from "../../utils/constants";
 import {assignTimeToDate, getYearMonthDay} from "../../utils/time-handler";
 import Room from "../../db/model/room";
 
 
 const createParallelEvent = async (parallel: any, semesterStart: Date, semesterEnd: Date) => {
-    const { parity, startTime, day, endTime, room } = parallel.timetableSlot;
+    const {parity, startTime, day, endTime, room} = parallel.timetableSlot;
     const startDay = [BOTH, ODD].includes(parity) ? semesterStart : new Date(new Date(semesterStart.getTime()).setDate(semesterStart.getDate() + 7))
     const endDay = [BOTH, EVEN].includes(parity) ? semesterEnd : new Date(new Date(semesterStart.getTime()).setDate(semesterStart.getDate() - 7))
     let week = 0
     const events = []
     const roomName = room["_"]
-    const roomFromDb = await Room.findOne({ displayName: roomName });
-    if(!roomFromDb){
+    const roomFromDb = await Room.findOne({displayName: roomName});
+    if (!roomFromDb) {
         return []
     }
-    // while(week < WEEKS_OF_LECTURES){
-    //     const isWeekOdd = week % 2
-    //     if(parity === ODD && !isWeekOdd){
-    //         week +=1;
-    //         continue
-    //     }
-    //     if(parity === EVEN && isWeekOdd){
-    //         week +=1;
-    //         continue
-    //     }
-    //     const helperDate = new Date(startDay)
-    //     const eventDateStart = new Date(helperDate.getTime()).setDate(semesterStart.getDate() + (day-1) + (7 * week))
-    //     const event = {
-    //         subject: parallel.course["_"],
-    //         body: {
-    //             contentType: 'HTML',
-    //             content: parallel.course["_"]
-    //         },
-    //         location: {
-    //             displayName: roomName
-    //         },
-    //         start: {
-    //             dateTime: assignTimeToDate(new Date(eventDateStart), startTime).toISOString(),
-    //             timeZone: "Central Europe Standard Time"
-    //         },
-    //         end: {
-    //             dateTime: assignTimeToDate(new Date(eventDateStart), endTime).toISOString(),
-    //             timeZone: "Central Europe Standard Time"
-    //         },
-    //         attendees: [
-    //             {
-    //                 emailAddress: {
-    //                     address: roomFromDb?.emailAddress,
-    //                     name: roomName
-    //                 },
-    //                 type: 'required'
-    //             }
-    //         ],
-    //     };
-    //
-    //
-    //     events.push(event)
-    //     week += 1
-    // }
-    const event = {
+
+    return {
         subject: parallel.course["_"],
         body: {
             contentType: 'HTML',
@@ -72,6 +29,9 @@ const createParallelEvent = async (parallel: any, semesterStart: Date, semesterE
             dateTime: assignTimeToDate(startDay, endTime).toISOString(),
             timeZone: "Central Europe Standard Time"
         },
+        location: {
+            displayName: roomName
+        },
         recurrence: {
             pattern: {
                 type: "weekly",
@@ -83,29 +43,25 @@ const createParallelEvent = async (parallel: any, semesterStart: Date, semesterE
                 type: "endDate",
                 startDate: getYearMonthDay(startDay),
                 endDate: getYearMonthDay(endDay)
-            }
+            },
+
         },
         attendees: [
             {
                 emailAddress: {
-                                        address: roomFromDb?.emailAddress,
-                                        name: roomName
-                                    },
+                    address: roomFromDb?.emailAddress,
+                    name: roomName
+                },
                 type: 'required'
             }]
-    }
+    };
 
-
-            return event;
-
-
-    // return events;
 }
 
 const createExamEvent = async (exam: any) => {
-    const { course, room, startDate, endDate } = exam;
+    const {course, room, startDate, endDate} = exam;
     const roomName = room["_"]
-    const roomFromDb = await Room.findOne({ displayName: roomName });
+    const roomFromDb = await Room.findOne({displayName: roomName});
     return roomFromDb ? {
         subject: `Exam - ${course["_"]}`,
         body: {
@@ -137,12 +93,12 @@ const createExamEvent = async (exam: any) => {
 }
 
 const createCourseEvent = async (event: any) => {
-    const { title, content } = event
-    const roomName =  content?.room["_"] || content?.note["_"]
-    if(!roomName){
+    const {title, content} = event
+    const roomName = content?.room["_"] || content?.note["_"]
+    if (!roomName) {
         return
     }
-    const roomFromDb = await Room.findOne({ displayName: roomName });
+    const roomFromDb = await Room.findOne({displayName: roomName});
 
     return roomFromDb ? {
         subject: title,
@@ -174,7 +130,11 @@ const createCourseEvent = async (event: any) => {
 
 }
 
-export const parseParrallels = async ({ semesterStart, semesterEnd, data }: { semesterStart: Date, semesterEnd: Date, data: any  }) => {
+export const parseParrallels = async ({semesterStart, semesterEnd, data}: {
+    semesterStart: Date,
+    semesterEnd: Date,
+    data: any
+}) => {
 
     // @ts-ignore
     const result = await Promise.all(data?.map(parallel => createParallelEvent(parallel, semesterStart, semesterEnd))) || []

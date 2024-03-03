@@ -14,10 +14,12 @@ const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
     const theme = useTheme()
     const { data } = useGetEvents({roomEmail})
     // const celendar = useGetCalendar({roomEmail})
-    console.log(data)
+
     const styles = { backgroundColor: color,...{ style } }
-    const currentEvent = data?.find((event: any) => event.isAllDay || isRunningEvent(new Date(event.start.dateTime), new Date(event.end.dateTime)))
-    const events = data?.filter((event: any) => {
+    const currentEvents = data?.filter((event: any) => event.isAllDay || isRunningEvent(new Date(event.start.dateTime), new Date(event.end.dateTime)))
+
+    const currentEvent = currentEvents?.length ? currentEvents[0] : null
+    const upcomingEvents = data?.filter((event: any) => {
         if(currentEvent && event.id === currentEvent.id){
             return null;
         }
@@ -29,24 +31,32 @@ const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
         return event
     })
 
+
     useEffect(() => {
         setRoomStatus(!currentEvent)
-    }, [currentEvent, events]);
+    }, [currentEvent, upcomingEvents]);
+
 
     return (
         <Box height="90vh" display="flex" flexDirection="column">
             <Box p={2} style={styles} display="flex" alignItems="center" flexDirection="row" justifyContent="space-between">
                 <Typography variant="h1" fontWeight="bold" >{isRoomFree ? "Free" : "Busy"}</Typography>
-                {events?.length ? <Timer event={isRoomFree ? events[0] : currentEvent || undefined}/> : null}
+                {upcomingEvents?.length ? <Timer event={isRoomFree ? upcomingEvents[0] : currentEvent || undefined}/> : null}
             </Box>
             <Box display="flex" flexDirection="row" height="80%">
                 <Box mr={4} p={2} display="flex" width="75%" flexDirection="row" justifyContent="space-between">
                     <Box display="flex" flexDirection="column" gap={2}>
                         <Typography variant="h3">{name}</Typography>
-                        <Box display="flex" flexDirection="column" gap={0.5} px={3}>
+                        {currentEvents?.length > 1 ? currentEvents.map((event: any) => (
+                                <Box pb={1} display="flex" flexDirection="column" gap={2}>
+                                <Typography variant="h4">{event?.subject}</Typography>
+                                <Typography variant="h4">{`${formatDate(new Date(event?.start.dateTime || ""), true)} - ${formatDate(new Date(event?.end.dateTime || ""),true)}`}</Typography>
+                                </Box>
+                            )) : (<Box display="flex" flexDirection="column" gap={0.5} px={3}>
                             <Typography variant="subtitle1">Room timetable</Typography>
                             <QRCode value={`https://timetable.fit.cvut.cz/new/rooms/${name}`}  size={192}/>
-                        </Box>
+                        </Box>)}
+
                     </Box>
                     <Box py={1} display="flex" flexDirection="column" gap={4}>
                         <Box pb={1} display="flex" flexDirection="column" gap={2}>
@@ -61,7 +71,7 @@ const Room = ({ roomEmail, name }: { roomEmail: string, name: string }) => {
                 </Box>
                 <Divider orientation="vertical" variant="middle" flexItem />
                 <Box alignSelf="center" height="100%" display="flex" width="25%" flexDirection="column" >
-                    <EventList items={events} />
+                    <EventList items={upcomingEvents} />
                 </Box>
             </Box>
         </Box>)
