@@ -18,7 +18,7 @@ export class KosApiClient extends CvutApiHandler{
             console.log(e)
         }
     }
-    private _getAvailableRooms = async () => {
+    public getAvailableRooms = async () => {
         try{
             return await Room.find({})
         }catch (error: any) {
@@ -74,7 +74,7 @@ export class KosApiClient extends CvutApiHandler{
     }
     getParallels = async (semester: string) => {
         try {
-            const rooms = await this._getAvailableRooms()
+            const rooms = await this.getAvailableRooms()
             const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
             const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`})
             return res?.map(parallel => parallel?.content)
@@ -87,7 +87,7 @@ export class KosApiClient extends CvutApiHandler{
 
     getExams = async (semester: string) => {
         try {
-            const rooms = await this._getAvailableRooms()
+            const rooms = await this.getAvailableRooms()
             const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
             //  and (${queryString})
             const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?limit=${LIMIT}&offset=0&query=semester==${semester}`})

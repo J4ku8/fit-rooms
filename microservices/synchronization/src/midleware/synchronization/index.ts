@@ -69,7 +69,7 @@ const createParallelEvent = async (parallel: any, semesterStart: Date, semesterE
             timeZone: "Central Europe Standard Time"
         },
         end: {
-            dateTime: assignTimeToDate(endDay, endTime).toISOString(),
+            dateTime: assignTimeToDate(startDay, endTime).toISOString(),
             timeZone: "Central Europe Standard Time"
         },
         recurrence: {
@@ -177,13 +177,13 @@ const createCourseEvent = async (event: any) => {
 export const parseParrallels = async ({ semesterStart, semesterEnd, data }: { semesterStart: Date, semesterEnd: Date, data: any  }) => {
 
     // @ts-ignore
-    const result = await Promise.all(data.map(parallel => createParallelEvent(parallel, semesterStart, semesterEnd))) || []
+    const result = await Promise.all(data?.map(parallel => createParallelEvent(parallel, semesterStart, semesterEnd))) || []
     return result?.filter(value => value !== null)
 }
 
 export const parseExams = async (data: any) => {
     // @ts-ignore
-    const result = await Promise.all(data.map(exam => createExamEvent(exam)))
+    const result = await Promise.all(data?.map(exam => createExamEvent(exam)))
     return result?.filter(value => value !== null)
 }
 
