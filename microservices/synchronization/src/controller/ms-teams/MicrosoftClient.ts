@@ -42,10 +42,9 @@ class MicrosoftClient {
     }
 
     public async createEvent({roomEmail, event}: {roomEmail: string, event: any}): Promise<void> {
-        console.log(roomEmail)
         const res = await this.client.api(`/users/${roomEmail}/calendar/events`)
             .post(event);
-        console.log(res)
+        return res
     }
     public async deleteEvent({roomEmail, eventId}: {roomEmail: string, eventId: any}): Promise<void> {
         const res = await this.client.api(`/users/${roomEmail}/calendar/events/${eventId}`)
@@ -53,7 +52,7 @@ class MicrosoftClient {
         return res
     }
 
-    public async sendEmail({roomId, recipients, content}: {roomId: string, recipients?: any, content: string}){
+    public async sendEmail({roomId, recipient, content}: {roomId: string, recipient?: string, content: string}){
         const email = {
             message: {
                 subject: 'Conflict with KOS meeting',
@@ -61,11 +60,10 @@ class MicrosoftClient {
                     contentType: 'Text',
                     content: content
                 },
-                // recipients
                 toRecipients: [
                     {
                         emailAddress: {
-                            address: recipients
+                            address: recipient
                         }
                     }
                 ],
@@ -74,10 +72,8 @@ class MicrosoftClient {
             saveToSentItems: 'false'
         };
         console.log("sending...")
-       const res = await this.client.api(`/users/${roomId}/sendMail`)
-            .post(email);
-
-       console.log(res)
+        return await this.client.api(`/users/${roomId}/sendMail`)
+           .post(email)
     }
 
 }

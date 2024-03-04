@@ -8,10 +8,11 @@ import {WEEKS_OF_LECTURES} from "./utils/constants";
 import {KosApiClient} from "./controller/cvut-kos/KosClient";
 import initCrons from './midleware/cron';
 import MicrosoftClient from './controller/ms-teams/MicrosoftClient';
-import {Conflict, Event as EventType} from "./utils/types";
-import Room from "./db/model/room";
+import {Event as EventType} from "./utils/types";
 import microsoftClient from "./controller/ms-teams/MicrosoftClient";
-import moment from "moment";
+
+import Conflict from './db/model/conflict';
+import Room from "./db/model/room";
 
 const app: Express = express();
 app.use(helmet());
@@ -67,9 +68,29 @@ const kos_client = new KosApiClient();
     }
     ]
 
-   const { conflictedEvents, newEvents } = await getEvents(pokus, microsoft_client)
-    console.log(conflictedEvents.length, newEvents.length)
-    // to email -> API
+   // const { conflictedEvents, newEvents } = await getEvents(pokus, microsoft_client)
+
+    const res = await microsoft_client.sendEmail({ roomId: 'Test_room@x2h3h.onmicrosoft.com', recipient: "tichyj15@x2h3h.onmicrosoft.com", content: "Testing email" });
+    console.log(res)
+    // try {
+    //     const eventPromises = newEvents
+    //         ?.filter((event: EventType | undefined): event is EventType => event !== undefined)
+    //         .map(async (event: EventType) => {
+    //             return await microsoft_client.createEvent({ roomEmail: event.attendees[0].emailAddress.address, event: event });
+    //         });
+    //     const conflictPromises = conflictedEvents?.map(async (conflict: EventType) => {
+    //         const room = await Room.findOne({displayName: conflict.location.displayName})
+    //         const prevConflict = await Conflict.findOne({ eventName: conflict.subject, start: conflict.start.dateTime, end: conflict.start.dateTime })
+    //         if(room && !prevConflict){
+    //             return await microsoft_client.sendEmail({ roomId: room?.roomId, recipients: "tichyj15@x2h3h.onmicrosoft.com", content: `There is a conflict between existing event ${conflict.subject} at ${conflict.start.dateTime} and new incoming from KOS ${conflict.subject} at ${conflict.start.dateTime}` });
+    //         }
+    //         await Conflict.create({ eventName: conflict.subject, start: conflict.start.dateTime, end: conflict.start.dateTime })
+    //     });
+    //     await Promise.all([eventPromises, conflictPromises])
+    // }catch (e) {
+    //     console.log(e)
+    // }
+
 
 
     // await initCrons(kos_client, microsoft_client)
