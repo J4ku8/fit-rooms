@@ -1,6 +1,10 @@
 import {BOTH, days, EVEN, ODD} from "../../utils/constants";
 import {assignTimeToDate, getYearMonthDay} from "../../utils/time-handler";
 import Room from "../../db/model/room";
+import {Event as EventType} from "../../utils/types";
+import moment from "moment/moment";
+import MicrosoftClient from "../../controller/ms-teams/MicrosoftClient";
+import event from "../../db/model/event";
 
 
 const createParallelEvent = async (parallel: any, semesterStart: Date, semesterEnd: Date) => {
@@ -151,4 +155,65 @@ export const parseCourseEvents = async (data: any) => {
     // @ts-ignore
     const result = await Promise.all(data?.map(event => createCourseEvent(event))) || []
     return result?.filter(value => value !== null)
+}
+
+const getIsSameDay = (newEvent: EventType, existingEvent: EventType) => {
+    if(newEvent?.recurrence){
+        return newEvent?.recurrence?.pattern?.daysOfWeek.some(day => {
+            if(existingEvent?.recurrence){
+                return existingEvent?.recurrence?.pattern?.daysOfWeek?.includes(day)
+            }
+            const date = moment(newEvent.start.dateTime);
+            const dayName = date.format('dddd').charAt(0).toUpperCase() + date.format('dddd').slice(1);
+            return dayName === day
+        })
+    }
+    if(existingEvent?.recurrence){
+        return existingEvent?.recurrence?.pattern?.daysOfWeek.some(day => {
+            if(newEvent?.recurrence){
+                return newEvent?.recurrence?.pattern?.daysOfWeek?.includes(day)
+            }
+            const date = moment(existingEvent.start.dateTime);
+            const dayName = date.format('dddd').charAt(0).toUpperCase() + date.format('dddd').slice(1);
+            return dayName === day
+        })
+    }
+    const newDateDay = moment(newEvent.start.dateTime);
+    const newDayName = newDateDay.format('dddd').charAt(0).toUpperCase() + newDateDay.format('dddd').slice(1);
+    const existingDateDay = moment(existingEvent.start.dateTime);
+    const existingDayName = existingDateDay.format('dddd').charAt(0).toUpperCase() + existingDateDay.format('dddd').slice(1);
+    return existingDayName === newDayName
+}
+
+export const getEvents = async (events: EventType[], microsoft_client: MicrosoftClient) => {
+    const conflictedEvents: EventType[] = []
+    const newEventsPromises: Promise<EventType | undefined>[] = events.map(async (event: EventType) => {
+        const eventRoom = event.attendees[0].emailAddress.address;
+        const createdEvents = await microsoft_client.roomEvents(eventRoom);
+        const conflicts = createdEvents?.filter((existingEvent: EventType) => {
+            const startTimeExisting = moment(moment(existingEvent.start.dateTime).format('HH:mm:ss'), 'HH:mm:ss');
+            const endTimeExisting = moment(moment(existingEvent.end.dateTime).format('HH:mm:ss'),  'HH:mm:ss');
+            const startTimeNew = moment(moment(event.start.dateTime).format('HH:mm:ss'),  'HH:mm:ss');
+            const endTimeNew = moment(moment(event.end.dateTime).format('HH:mm:ss'),  'HH:mm:ss');
+            const isSameDay = getIsSameDay(event, existingEvent);
+            const isSameRoom = existingEvent.attendees.some(attendee => attendee.emailAddress.address === eventRoom);
+
+            return isSameRoom && isSameDay &&
+                ((startTimeNew.isSameOrBefore(endTimeExisting) && endTimeNew.isSameOrAfter(startTimeExisting)) ||
+                    (startTimeNew.isAfter(startTimeExisting) && endTimeNew.isBefore(endTimeExisting)) ||
+                    (startTimeNew.isSameOrBefore(startTimeExisting) && endTimeNew.isSameOrAfter(endTimeExisting)));
+        });
+
+        conflictedEvents.push(conflicts)
+        if (!conflicts.length) {
+            return event;
+        }
+        return
+    });
+
+    const newEvents = await Promise.all(newEventsPromises);
+    newEvents.filter((event) => event !== undefined);
+
+    return { conflictedEvents, newEvents };
+
 }

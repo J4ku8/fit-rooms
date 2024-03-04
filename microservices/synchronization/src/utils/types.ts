@@ -80,6 +80,20 @@ type Location = {
     displayName: string;
 }
 
+type Recurrence = {
+    pattern: {
+        type: string;
+        interval: number;
+        daysOfWeek: string[];
+        firstDayOfWeek: string;
+    };
+    range: {
+        type: string;
+        startDate: string;
+        endDate: string;
+    };
+};
+
 export type Event = {
     subject: string;
     id?: string;
@@ -97,6 +111,7 @@ export type Event = {
         dateTime: string;
         timeZone: string;
     };
+    recurrence: Recurrence;
     attendees: Array<Attendee>;
 };
 
