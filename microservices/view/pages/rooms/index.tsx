@@ -6,7 +6,6 @@ import {getRooms} from "../../src/utils/db";
 
 
 const WithStaticProps = ({ rooms }: RoomListType) => {
-
     return (
         <Providers transparentFooter title="Users List">
             <h1>List of all available rooms</h1>

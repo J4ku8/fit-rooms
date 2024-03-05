@@ -9,7 +9,7 @@ export class KosApiClient extends CvutApiHandler{
     private _filterEventsByRooms = async (events: any) => {
         const rooms = await Room.find({})
         // @ts-ignore
-        return events.filter(event => event?.content?.room && rooms.some(room => room.name === event?.content?.room["_"] || event?.content?.note && room.name ===event?.content?.note["_"]))
+        return events?.filter(event => event?.content?.room && rooms.some(room => room.displayName === event?.content?.room["_"] || event?.content?.note && room.displayName === event?.content?.note["_"]))
     }
     private _extractCourseEvents = async (dataset: any) => {
         try{
@@ -18,7 +18,7 @@ export class KosApiClient extends CvutApiHandler{
             console.log(e)
         }
     }
-    private _getAvailableRooms = async () => {
+    public getAvailableRooms = async () => {
         try{
             return await Room.find({})
         }catch (error: any) {
@@ -28,7 +28,7 @@ export class KosApiClient extends CvutApiHandler{
 
     }
 
-    getSemester = async (): Promise<SemesterSchema | null> => {
+    getSemester = async (): Promise<SemesterSchema> => {
         try {
             const today = new Date();
             const storedSemester = await Semester.findOne({
@@ -62,18 +62,19 @@ export class KosApiClient extends CvutApiHandler{
                     .catch((error) => {
                         console.error('Chyba při vkládání záznamu:', error);
                     });
-
                 return newSemester
             }
         } catch (error: any) {
             // Handle errors
             console.error('Error making API call getSemester ::', error?.message);
-            return null;
+            const now = new Date();
+            const endOfSemester = new Date(now.getMonth() + 3)
+            return { from: now, to: endOfSemester, name: ""};
         }
     }
-    getParallels = async (semester: string = "B231") => {
+    getParallels = async (semester: string) => {
         try {
-            const rooms = await this._getAvailableRooms()
+            const rooms = await this.getAvailableRooms()
             const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
             const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`})
             return res?.map(parallel => parallel?.content)
@@ -83,7 +84,22 @@ export class KosApiClient extends CvutApiHandler{
             return null;
         }
     }
-    getCourseEvent = async (semester: string = "B231") => {
+
+    getExams = async (semester: string) => {
+        try {
+            const rooms = await this.getAvailableRooms()
+            const queryString = rooms?.map(room => room.displayName).map(roomName => `timetableSlot/room.code==${roomName}`).join(",")
+            //  and (${queryString})
+            const res = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?limit=${LIMIT}&offset=0&query=semester==${semester}`})
+            return res?.map(parallel => parallel?.content)
+        } catch (error: any) {
+            // Handle errors
+            console.error('Error making API call getExams::', error?.message);
+            return null;
+        }
+    }
+
+    getCourseEvent = async (semester: string) => {
         try {
             const dataset = await this.handleApiCall({query: `${ApiProviders.KOS_API}${KosApiRoutes.COURSE_EVENT}?limit=1000&query=semester==${semester}`})
             return await this._extractCourseEvents(dataset)

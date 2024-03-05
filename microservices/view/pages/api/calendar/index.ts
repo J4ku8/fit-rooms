@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import {isToday, todayDate} from "../../../src/utils/time-helper";
+import {isToday, thisMonthRange, todayDate} from "../../../src/utils/time-helper";
 import GraphApiClient from "../../../model/GraphApiClient";
 import {AppSettings, PatternTypes} from "../../../src/types";
 
@@ -14,13 +14,10 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
         const roomEmail = _req.query.roomEmail
         const microsoftAuth = new GraphApiClient(settings)
         const client = microsoftAuth.initializeGraphForAppOnlyAuth()
-        const date = todayDate()
-        const events = await client?.api(`/users/tha1455@x2h3h.onmicrosoft.com/calendarView?startDateTime=${date}T00:00:00&endDateTime=${date}T23:59:59`)
+        const calendar = await client?.api(`/users/${roomEmail}/calendar`)
             .header('Prefer','outlook.timezone="Central Europe Standard Time"')
-            .orderby('start/dateTime')
             .get()
-
-        res.status(200).json(events.value)
+        res.status(200).json(calendar)
 
     } catch (err: any) {
         console.log(`Error getting events: ${err}`);

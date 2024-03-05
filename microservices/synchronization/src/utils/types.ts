@@ -2,15 +2,13 @@ import { Document, Model } from 'mongoose';
 
 
 export enum KosApiRoutes {
-    DIVISION =  "/rooms",
     SEMESTER = "/semesters",
     PARALLELS = "/parallels",
     COURSE_EVENT = "/courseEvents",
-    TEACHERS = "/teachers"
+    EXAMS = "/exams",
 }
 
 export enum ApiProviders {
-    TEAMS = "/teams",
     KOS_API = "https://kosapi.fit.cvut.cz/api/3"
 }
 
@@ -70,3 +68,52 @@ export type SemesterSchema = {
 }
 export interface SemesterDocument extends SemesterSchema, Document {}
 
+type Attendee = {
+    emailAddress: {
+        address: string;
+        name: string;
+    };
+    type: string;
+}
+
+type Location = {
+    displayName: string;
+}
+
+type Recurrence = {
+    pattern: {
+        type: string;
+        interval: number;
+        daysOfWeek: string[];
+        firstDayOfWeek: string;
+    };
+    range: {
+        type: string;
+        startDate: string;
+        endDate: string;
+    };
+};
+
+export type Event = {
+    subject: string;
+    id?: string;
+    body: {
+        contentType: string;
+        content: string;
+    };
+    location: Location;
+    locations?: Array<Location>
+    start: {
+        dateTime: string;
+        timeZone: string;
+    };
+    end: {
+        dateTime: string;
+        timeZone: string;
+    };
+    recurrence: Recurrence;
+    attendees: Array<Attendee>;
+};
+
+
+export type Conflict = Array<{ current: Event; newEvent: Event; roomId: string }>
