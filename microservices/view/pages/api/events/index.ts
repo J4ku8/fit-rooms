@@ -15,9 +15,8 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
         const microsoftAuth = new GraphApiClient(settings)
         const client = microsoftAuth.initializeGraphForAppOnlyAuth()
         const date = todayDate()
-        const events = await client?.api(`/users/${roomEmail}/calendarView?startDateTime=${date}T00:00:00&endDateTime=${date}T23:59:59`)
+        const events = await client?.api(`/users/tha1455@x2h3h.onmicrosoft.com/calendarView?startDateTime=${date}T00:00:00&endDateTime=${date}T23:59:59`)
             .header('Prefer','outlook.timezone="Central Europe Standard Time"')
-            // .select("subject,body,bodyPreview,organizer,start,end")
             .orderby('start/dateTime')
             .get()
 

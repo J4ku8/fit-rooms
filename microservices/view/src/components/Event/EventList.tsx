@@ -10,7 +10,7 @@ type Props = {
 const EventList = ({ items }: Props) => (
     <Box mx={4} height="100%">
         <Box textAlign="center" height="100%">
-            {items?.length > 5 && <Typography variant="caption">
+            {items?.length > 4 && <Typography variant="caption">
                 More events
             </Typography>}
             {!items?.length ? (
@@ -19,9 +19,16 @@ const EventList = ({ items }: Props) => (
                     No more events for today
                 </Typography>
             </Box>
-            ) : items?.map((item, i) => (
-                <EventItem key={i} data={item} />
-            ))}
+            ) : (
+                <Box>
+                    <Typography py={2} variant="h5">
+                        Upcoming events
+                    </Typography>
+                    {items?.map((item, i) => (
+                        <EventItem key={i} data={item}/>
+                    ))}
+                </Box>
+                    )}
         </Box>
     </Box>
 )
