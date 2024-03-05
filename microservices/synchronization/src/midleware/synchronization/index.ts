@@ -1,10 +1,12 @@
-import {BOTH, days, EVEN, ODD} from "../../utils/constants";
+import {BOTH, days, EVEN, ODD, WEEKS_OF_LECTURES} from "../../utils/constants";
 import {assignTimeToDate, getYearMonthDay} from "../../utils/time-handler";
 import Room from "../../db/model/room";
 import {Event as EventType} from "../../utils/types";
 import moment from "moment/moment";
 import MicrosoftClient from "../../controller/ms-teams/MicrosoftClient";
 import event from "../../db/model/event";
+import Conflict from "../../db/model/conflict";
+import {KosApiClient} from "../../controller/cvut-kos/KosClient";
 
 
 const createParallelEvent = async (parallel: any, semesterStart: Date, semesterEnd: Date) => {
@@ -216,4 +218,44 @@ export const getEvents = async (events: EventType[], microsoft_client: Microsoft
 
     return { conflictedEvents, newEvents };
 
+}
+
+export const syncEvents = async (kos_client: KosApiClient, microsoft_client: MicrosoftClient) => {
+    const semester = await kos_client.getSemester();
+
+    const courseEvents = await kos_client.getCourseEvent(semester.name);
+    const exams = await kos_client.getExams(semester.name)
+    const parallels = await kos_client.getParallels(semester?.name);
+
+    const endOfLectures = new Date(new Date(semester.from).setDate(semester.from.getDate() + (WEEKS_OF_LECTURES * 7) + 5));
+    const microsoftParrallels = await parseParrallels({
+        semesterStart: semester.from,
+        semesterEnd: endOfLectures,
+        data: parallels
+    });
+    const microsoftExams = await parseExams(exams);
+    const microsoftCourseEvents = await parseCourseEvents(courseEvents);
+    const allEvents = [...microsoftParrallels?.flat(), ...microsoftExams, ...microsoftCourseEvents]
+
+
+    const { conflictedEvents, newEvents } = await getEvents(allEvents, microsoft_client)
+
+    try {
+        const eventPromises = newEvents
+            ?.filter((event: EventType | undefined): event is EventType => event !== undefined)
+            .map(async (event: EventType) => {
+                return await microsoft_client.createEvent({ roomEmail: event.attendees[0].emailAddress.address, event: event });
+            });
+        const conflictPromises = conflictedEvents?.map(async (conflict: EventType) => {
+            const room = await Room.findOne({displayName: conflict.location.displayName})
+            const prevConflict = await Conflict.findOne({ eventName: conflict.subject, start: conflict.start.dateTime, end: conflict.start.dateTime })
+            if(room && !prevConflict){
+                return await microsoft_client.sendEmail({ roomId: room?.roomId, recipient: "tichyj15@x2h3h.onmicrosoft.com", content: `There is a conflict between existing event ${conflict.subject} at ${conflict.start.dateTime} and new incoming from KOS ${conflict.subject} at ${conflict.start.dateTime}` });
+            }
+            await Conflict.create({ eventName: conflict.subject, start: conflict.start.dateTime, end: conflict.start.dateTime })
+        });
+        await Promise.all([eventPromises, conflictPromises])
+    }catch (e) {
+        console.log(e)
+    }
 }

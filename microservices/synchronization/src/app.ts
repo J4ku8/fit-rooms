@@ -22,78 +22,11 @@ const microsoft_client = new MicrosoftClient();
 const kos_client = new KosApiClient();
 (async () => {
     await connect();
-    const semester = await kos_client.getSemester();
 
-    const courseEvents = await kos_client.getCourseEvent(semester.name);
-    const exams = await kos_client.getExams(semester.name)
-    const parallels = await kos_client.getParallels(semester?.name);
-
-    const endOfLectures = new Date(new Date(semester.from).setDate(semester.from.getDate() + (WEEKS_OF_LECTURES * 7) + 5));
-    const microsoftParrallels = await parseParrallels({
-        semesterStart: semester.from,
-        semesterEnd: endOfLectures,
-        data: parallels
-    });
-    const microsoftExams = await parseExams(exams);
-    const microsoftCourseEvents = await parseCourseEvents(courseEvents);
-    const allEvents = [...microsoftParrallels?.flat(), ...microsoftExams, ...microsoftCourseEvents]
-
-    const pokus: EventType[] = [{
-        subject: 'Test event',
-        body: { contentType: 'HTML', content: 'Test event' },
-        start: {
-            dateTime: '2024-02-19T11:00:00.000Z',
-            timeZone: 'Central Europe Standard Time'
-        },
-        end: {
-            dateTime: '2024-02-19T12:00:00.000Z',
-            timeZone: 'Central Europe Standard Time'
-        },
-        location: { displayName: 'test_room' },
-        recurrence: {
-            pattern: {
-                type: 'weekly',
-                interval: 1,
-                daysOfWeek: ["Monday"],
-                firstDayOfWeek: 'Monday'
-            },
-            range: { type: 'endDate', startDate: '2024-02-19', endDate: '2024-05-25' }
-        },
-        attendees: [
-            {
-                emailAddress: { address: 'Test_room@x2h3h.onmicrosoft.com', name: 'test_room' },
-                type: 'required'
-            }
-        ]
-    }
-    ]
-
-   // const { conflictedEvents, newEvents } = await getEvents(pokus, microsoft_client)
-
+    // TODO: test this
     const res = await microsoft_client.sendEmail({ roomId: 'Test_room@x2h3h.onmicrosoft.com', recipient: "tichyj15@x2h3h.onmicrosoft.com", content: "Testing email" });
-    console.log(res)
-    // try {
-    //     const eventPromises = newEvents
-    //         ?.filter((event: EventType | undefined): event is EventType => event !== undefined)
-    //         .map(async (event: EventType) => {
-    //             return await microsoft_client.createEvent({ roomEmail: event.attendees[0].emailAddress.address, event: event });
-    //         });
-    //     const conflictPromises = conflictedEvents?.map(async (conflict: EventType) => {
-    //         const room = await Room.findOne({displayName: conflict.location.displayName})
-    //         const prevConflict = await Conflict.findOne({ eventName: conflict.subject, start: conflict.start.dateTime, end: conflict.start.dateTime })
-    //         if(room && !prevConflict){
-    //             return await microsoft_client.sendEmail({ roomId: room?.roomId, recipients: "tichyj15@x2h3h.onmicrosoft.com", content: `There is a conflict between existing event ${conflict.subject} at ${conflict.start.dateTime} and new incoming from KOS ${conflict.subject} at ${conflict.start.dateTime}` });
-    //         }
-    //         await Conflict.create({ eventName: conflict.subject, start: conflict.start.dateTime, end: conflict.start.dateTime })
-    //     });
-    //     await Promise.all([eventPromises, conflictPromises])
-    // }catch (e) {
-    //     console.log(e)
-    // }
 
-
-
-    // await initCrons(kos_client, microsoft_client)
+    await initCrons(kos_client, microsoft_client)
 })();
 
 export default app;
