@@ -5,6 +5,7 @@ import {Typography} from "@mui/material";
 import Providers from "../../src/components/Providers";
 import {getRooms} from "../../src/utils/db";
 import Room from "../../src/components/Room";
+import {sampleRoomsData} from "../../src/utils/sample-data";
 
 type Props = {
     item?: RoomType

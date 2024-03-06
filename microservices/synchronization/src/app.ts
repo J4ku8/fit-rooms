@@ -4,8 +4,9 @@ import bodyParser from 'body-parser';
 
 import connect from './db';
 import { KosApiClient } from './controller/cvut-kos/KosClient';
-import initCrons from './midleware/cron';
+import initCrons, {writeRooms} from './midleware/cron';
 import MicrosoftClient from './controller/ms-teams/MicrosoftClient';
+import microsoftClient from "./controller/ms-teams/MicrosoftClient";
 
 const app: Express = express();
 app.use(helmet());
@@ -15,7 +16,7 @@ const microsoft_client = new MicrosoftClient();
 const kos_client = new KosApiClient();
 (async () => {
   await connect();
-
+  await writeRooms(microsoft_client)
   // // TODO: test this
   // const res = await microsoft_client.sendEmail({ roomId: 'Test_room@x2h3h.onmicrosoft.com', recipient: "tichyj15@x2h3h.onmicrosoft.com", content: "Testing email" });
 

@@ -1,10 +1,10 @@
 import { Event, Room } from "../types";
 
 export const sampleRoomsData: Room[] = [
-  { id: "TH:A-905" },
-  { id: "TH:A-1015" },
-  { id: "TH:A-915" },
-  { id: "TH:A-955" },
+  { displayName: "TH:A-905", emailAddress: "", roomId: "TH:A-905" },
+  { displayName: "TH:A-1015", emailAddress: "", roomId: "TH:A-1015" },
+  { displayName: "TH:A-915", emailAddress: "", roomId: "TH:A-915" },
+  { displayName: "TH:A-955", emailAddress: "", roomId: "TH:A-955" },
 ];
 
 export const sampleEventsData: Event[] = [
