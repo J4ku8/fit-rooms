@@ -182,7 +182,7 @@ export const parseExams = async (data: any) => {
 export const parseCourseEvents = async (data: any) => {
   // @ts-ignore
   const result =
-    (await Promise.all(data?.map((even: any) => createCourseEvent(event)))) || [];
+    (await Promise.all(data?.map((event: any) => createCourseEvent(event)))) || [];
   return result?.filter((value) => value !== null);
 };
 
