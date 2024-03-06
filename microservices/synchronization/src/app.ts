@@ -1,32 +1,25 @@
-import express, {Express} from 'express';
+import express, { Express } from 'express';
 import helmet from 'helmet';
-import bodyParser from "body-parser";
+import bodyParser from 'body-parser';
 
-import connect from "./db";
-import {getEvents, parseCourseEvents, parseExams, parseParrallels} from "./midleware/synchronization";
-import {WEEKS_OF_LECTURES} from "./utils/constants";
-import {KosApiClient} from "./controller/cvut-kos/KosClient";
+import connect from './db';
+import { KosApiClient } from './controller/cvut-kos/KosClient';
 import initCrons from './midleware/cron';
 import MicrosoftClient from './controller/ms-teams/MicrosoftClient';
-import {Event as EventType} from "./utils/types";
-import microsoftClient from "./controller/ms-teams/MicrosoftClient";
-
-import Conflict from './db/model/conflict';
-import Room from "./db/model/room";
 
 const app: Express = express();
 app.use(helmet());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 const microsoft_client = new MicrosoftClient();
 const kos_client = new KosApiClient();
 (async () => {
-    await connect();
+  await connect();
 
-    // TODO: test this
-    const res = await microsoft_client.sendEmail({ roomId: 'Test_room@x2h3h.onmicrosoft.com', recipient: "tichyj15@x2h3h.onmicrosoft.com", content: "Testing email" });
+  // // TODO: test this
+  // const res = await microsoft_client.sendEmail({ roomId: 'Test_room@x2h3h.onmicrosoft.com', recipient: "tichyj15@x2h3h.onmicrosoft.com", content: "Testing email" });
 
-    await initCrons(kos_client, microsoft_client)
+  await initCrons(kos_client, microsoft_client);
 })();
 
 export default app;
