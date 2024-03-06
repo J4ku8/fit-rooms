@@ -166,7 +166,7 @@ export const parseParrallels = async ({
   // @ts-ignore
   const result =
     (await Promise.all(
-      data?.map((parallel) =>
+      data?.map((parallel: any) =>
         createParallelEvent(parallel, semesterStart, semesterEnd)
       )
     )) || [];
@@ -182,7 +182,7 @@ export const parseExams = async (data: any) => {
 export const parseCourseEvents = async (data: any) => {
   // @ts-ignore
   const result =
-    (await Promise.all(data?.map((event) => createCourseEvent(event)))) || [];
+    (await Promise.all(data?.map((even: any) => createCourseEvent(event)))) || [];
   return result?.filter((value) => value !== null);
 };
 

@@ -3,13 +3,14 @@ import CvutApiHandler from './CvutApiHandler';
 import { LIMIT } from '../../utils/constants';
 import Semester from '../../db/model/semester';
 import Room from '../../db/model/room';
+import {EventType} from "@microsoft/microsoft-graph-types";
 
 export class KosApiClient extends CvutApiHandler {
   private _filterEventsByRooms = async (events: any) => {
     const rooms = await Room.find({});
     // @ts-ignore
     return events?.filter(
-      (event) =>
+      (event: any) =>
         event?.content?.room &&
         rooms.some(
           (room) =>
