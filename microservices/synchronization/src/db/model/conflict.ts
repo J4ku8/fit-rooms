@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const dateSchema = new mongoose.Schema({
-  dateTime: { type: Date, required: true },
+  dateTime: { type: String, required: true },
   timeZone: { type: String, required: true },
 });
 

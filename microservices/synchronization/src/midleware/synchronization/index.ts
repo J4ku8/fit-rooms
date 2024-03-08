@@ -30,8 +30,6 @@ const createParallelEvent = async (
     : new Date(
         new Date(semesterStart.getTime()).setDate(semesterStart.getDate() - 7)
       );
-  let week = 0;
-  const events = [];
   const roomName = room['_'];
   const roomFromDb = await Room.findOne({ displayName: roomName });
   if (!roomFromDb) {
@@ -59,7 +57,7 @@ const createParallelEvent = async (
       pattern: {
         type: 'weekly',
         interval: parity === BOTH ? 1 : 2,
-        daysOfWeek: [days[Number(day)]],
+        daysOfWeek: [days[Number(day) - 1]],
         firstDayOfWeek: days[0],
       },
       range: {
@@ -189,33 +187,35 @@ export const parseCourseEvents = async (data: any) => {
 const getIsSameDay = (newEvent: EventType, existingEvent: EventType) => {
   if (newEvent?.recurrence) {
     return newEvent?.recurrence?.pattern?.daysOfWeek.some((day) => {
+      const dayLowerCase = day.toLowerCase()
       if (existingEvent?.recurrence) {
-        return existingEvent?.recurrence?.pattern?.daysOfWeek?.includes(day);
+        return existingEvent?.recurrence?.pattern?.daysOfWeek?.includes(dayLowerCase);
       }
-      const date = moment(newEvent.start.dateTime);
+      const date = moment(newEvent?.start?.dateTime);
       const dayName =
         date.format('dddd').charAt(0).toUpperCase() +
-        date.format('dddd').slice(1);
-      return dayName === day;
+        date.format('dddd').slice(1).toLowerCase();
+      return dayName === dayLowerCase;
     });
   }
   if (existingEvent?.recurrence) {
     return existingEvent?.recurrence?.pattern?.daysOfWeek.some((day) => {
+      const dayLowerCase = day.toLowerCase()
       if (newEvent?.recurrence) {
-        return newEvent?.recurrence?.pattern?.daysOfWeek?.includes(day);
+        return newEvent?.recurrence?.pattern?.daysOfWeek?.includes(dayLowerCase);
       }
-      const date = moment(existingEvent.start.dateTime);
+      const date = moment(existingEvent?.start?.dateTime);
       const dayName =
         date.format('dddd').charAt(0).toUpperCase() +
-        date.format('dddd').slice(1);
-      return dayName === day;
+        date.format('dddd').slice(1).toLowerCase();
+      return dayName === dayLowerCase;
     });
   }
-  const newDateDay = moment(newEvent.start.dateTime);
+  const newDateDay = moment(newEvent?.start?.dateTime);
   const newDayName =
     newDateDay.format('dddd').charAt(0).toUpperCase() +
     newDateDay.format('dddd').slice(1);
-  const existingDateDay = moment(existingEvent.start.dateTime);
+  const existingDateDay = moment(existingEvent?.start?.dateTime);
   const existingDayName =
     existingDateDay.format('dddd').charAt(0).toUpperCase() +
     existingDateDay.format('dddd').slice(1);
@@ -226,26 +226,26 @@ export const getEvents = async (
   events: EventType[],
   microsoft_client: MicrosoftClient
 ) => {
-  const conflictedEvents: EventType[] = [];
+  const conflictedEvents: EventType[][] = [];
   const newEventsPromises: Promise<EventType | undefined>[] = events.map(
     async (event: EventType) => {
       const eventRoom = event.attendees[0].emailAddress.address;
-      const createdEvents = await microsoft_client.roomEvents(eventRoom);
+      const createdEvents: EventType[] = await microsoft_client.roomEvents(eventRoom);
       const conflicts = createdEvents?.filter((existingEvent: EventType) => {
         const startTimeExisting = moment(
-          moment(existingEvent.start.dateTime).format('HH:mm:ss'),
+          moment(existingEvent?.start?.dateTime).format('HH:mm:ss'),
           'HH:mm:ss'
         );
         const endTimeExisting = moment(
-          moment(existingEvent.end.dateTime).format('HH:mm:ss'),
+          moment(existingEvent?.end?.dateTime).format('HH:mm:ss'),
           'HH:mm:ss'
         );
         const startTimeNew = moment(
-          moment(event.start.dateTime).format('HH:mm:ss'),
+          moment(event?.start?.dateTime).format('HH:mm:ss'),
           'HH:mm:ss'
         );
         const endTimeNew = moment(
-          moment(event.end.dateTime).format('HH:mm:ss'),
+          moment(event?.end?.dateTime).format('HH:mm:ss'),
           'HH:mm:ss'
         );
         const isSameDay = getIsSameDay(event, existingEvent);
@@ -264,7 +264,6 @@ export const getEvents = async (
               endTimeNew.isSameOrAfter(endTimeExisting)))
         );
       });
-
       conflictedEvents.push(conflicts);
       if (!conflicts.length) {
         return event;
@@ -301,16 +300,16 @@ export const syncEvents = async (
   });
   const microsoftExams = await parseExams(exams);
   const microsoftCourseEvents = await parseCourseEvents(courseEvents);
-  const allEvents = [
+  const allEvents: EventType[] = [
     ...microsoftParrallels?.flat(),
     ...microsoftExams,
     ...microsoftCourseEvents,
   ];
-
   const { conflictedEvents, newEvents } = await getEvents(
     allEvents,
     microsoft_client
   );
+
 
   try {
     const eventPromises = newEvents
@@ -324,31 +323,40 @@ export const syncEvents = async (
           event: event,
         });
       });
-    const conflictPromises = conflictedEvents?.map(
+
+    const conflictPromises = conflictedEvents.flat()?.map(
       async (conflict: EventType) => {
         const room = await Room.findOne({
-          displayName: conflict.location.displayName,
+          displayName: conflict?.location?.displayName,
         });
         const prevConflict = await Conflict.findOne({
-          eventName: conflict.subject,
-          start: conflict.start.dateTime,
-          end: conflict.start.dateTime,
+          eventName: conflict?.subject,
+          start: conflict?.start,
+          end: conflict?.end,
         });
+
+
         if (room && !prevConflict) {
-          return await microsoft_client.sendEmail({
-            roomId: room?.roomId,
-            recipient: 'tichyj15@x2h3h.onmicrosoft.com',
-            content: `There is a conflict between existing event ${conflict.subject} at ${conflict.start.dateTime} and new incoming from KOS ${conflict.subject} at ${conflict.start.dateTime}`,
-          });
+          // TODO: validate send email
+          console.log("send email")
+
+          // return await microsoft_client.sendEmail({
+          //   roomId: room?.roomId,
+          //   recipient: 'tichyj15@x2h3h.onmicrosoft.com',
+          //   content: `There is a conflict between existing event ${conflict.subject} at ${conflict?.start?.dateTime} and new incoming from KOS ${conflict.subject} at ${conflict?.start?.dateTime}`,
+          // });
         }
+
         await Conflict.create({
-          eventName: conflict.subject,
-          start: conflict.start.dateTime,
-          end: conflict.start.dateTime,
+          eventName: conflict?.subject,
+          start: conflict?.start,
+          end: conflict?.end,
         });
       }
     );
-    await Promise.all([eventPromises, conflictPromises]);
+
+    const res = await Promise.all([eventPromises, conflictPromises]);
+    console.log("Write done!")
   } catch (e) {
     console.log(e);
   }

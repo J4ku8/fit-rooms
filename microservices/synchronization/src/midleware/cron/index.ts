@@ -10,7 +10,6 @@ import { KosApiClient } from '../../controller/cvut-kos/KosClient';
 const kosSync = (
   graphClient: MicrosoftClient,
   kosClient: KosApiClient,
-  semester: any
 ) =>
   cron.schedule(
     '*/30 * * * *',
@@ -70,7 +69,7 @@ const initCrons = async (
   graphClient: MicrosoftClient
 ) => {
   let semester = await kos_client.getSemester();
-  kosSync(graphClient, kos_client, semester).start();
+  kosSync(graphClient, kos_client).start();
   semesterTask(kos_client).start();
   roomSync(graphClient).start();
 };

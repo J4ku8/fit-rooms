@@ -8,6 +8,7 @@ export const getRooms = async () => {
 
   const collection = client.db(DB).collection(ROOMS_COLLECTION);
   const data = await collection.find({}).toArray();
+  console.log(JSON.parse(JSON.stringify(data)))
   client.close();
 
   return {
