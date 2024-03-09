@@ -1,10 +1,10 @@
 
 module.exports = {
-    exportPathMap: function () {
-        return {
-            '/': { page: '/rooms' },
-        };
-    },
+    // exportPathMap: function () {
+    //     return {
+    //         '/': { page: '/rooms' },
+    //     };
+    // },
     webpack: (config, { dev, isServer }) => {
         config.module.rules.push({
             test: /\.css$/,

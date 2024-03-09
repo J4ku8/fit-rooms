@@ -25,9 +25,7 @@ const Layout = ({children, title, transparentFooter }: ProvidersProps) => {
                         padding: "0.5rem 0",
                         borderRadius: "0 0 10px 10px"
                     }}>
-                        <Typography>{`Copyright © 2018-${year} ČVUT v Praze | provozuje ČVUT - Výpočetní a informační centrum | Hlášení chyb a námětů`}<a
-                            target="_blank"
-                            href="https://helpdesk.cvut.cz/vic_it/web-ist/vytvorit-ulohu">Helpdesk ČVUT</a>
+                        <Typography variant="subtitle2" >{`Copyright © 2018-${year} ČVUT v Praze | provozuje ČVUT - https://helpdesk.cvut.cz`}
                         </Typography>
                     </footer>
                 </Box>
