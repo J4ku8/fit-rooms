@@ -10,8 +10,16 @@ export type Event = {
   room: string;
   name: string;
   organiser: string;
-  from: string;
-  to: string;
+  start:{
+    dateTime: string;
+    timeZone: string
+  };
+  end:{
+    dateTime: string;
+    timeZone: string
+  };
+  subject: string;
+  recurrence: any;
 };
 
 export type Room = {
@@ -20,10 +28,16 @@ export type Room = {
   roomId: string;
 };
 
+export type DisplayRoom = {
+  roomEmail: string;
+  name: string;
+}
+
 export type ProvidersProps = {
   children: ReactNode;
   title?: string;
   transparentFooter?: boolean;
+  isMobile?: boolean
 };
 
 export type AppSettings = {
@@ -39,6 +53,7 @@ export type PatternTypes = {
 
 export type GraphApiFetch = {
   roomEmail: string;
+  date?: string;
 };
 
 export type RoomListType = {

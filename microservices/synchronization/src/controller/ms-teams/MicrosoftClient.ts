@@ -54,18 +54,6 @@ class MicrosoftClient {
       .post(event);
     return res;
   }
-  public async deleteEvent({
-    roomEmail,
-    eventId,
-  }: {
-    roomEmail: string;
-    eventId: any;
-  }): Promise<void> {
-    const res = await this.client
-      .api(`/users/${roomEmail}/calendar/events/${eventId}`)
-      .delete();
-    return res;
-  }
 
   public async sendEmail({
     roomId,

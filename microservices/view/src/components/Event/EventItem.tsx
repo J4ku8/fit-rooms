@@ -5,10 +5,10 @@ import {Box, Typography, useTheme} from "@mui/material";
 import {formatDate} from "../../utils/time-helper";
 
 type Props = {
-    data: Event
+    data: Event,
 }
 
-const EventItem = ({ data }: any) => {
+const EventItem = ({ data }: Props) => {
     const theme = useTheme()
     return (
         <Box my={1.5} px={0.5} textAlign="left" display="flex" flexDirection="column" style={{ borderLeft: `4px solid ${theme.palette.primary.main}`, borderRadius: "3px 0 0 3px"}}>

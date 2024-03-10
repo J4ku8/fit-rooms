@@ -29,8 +29,8 @@ export const thisMonthRange = () => {
   };
 };
 
-export const todayDate = () => {
-  const today = getCurrentDate();
+export const formatDateForApi = (date?: string) => {
+  const today = date ? new Date(date) : getCurrentDate();
 
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, "0");

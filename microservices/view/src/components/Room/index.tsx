@@ -7,9 +7,10 @@ import {formatDate, getCurrentDate, isRunningEvent} from "../../utils/time-helpe
 import Timer from "../Timer";
 import EventList from "../Event/EventList";
 import {useGetCalendar} from "../../queries/useGetCalendar";
+import {DisplayRoom} from "../../types";
 
 const style = {height: "25%", borderRadius: "10px 10px 0 0"}
-const Room = ({roomEmail, name}: { roomEmail: string, name: string }) => {
+const Room = ({roomEmail, name}: DisplayRoom) => {
     const {color, setRoomStatus, isRoomFree} = useGlobalContext()
     const {data} = useGetEvents({roomEmail})
     const styles = {backgroundColor: color, ...{style}}

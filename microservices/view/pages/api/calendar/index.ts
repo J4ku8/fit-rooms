@@ -19,10 +19,10 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     const microsoftAuth = new GraphApiClient(settings);
     const client = microsoftAuth.initializeGraphForAppOnlyAuth();
     const calendar = await client
-      ?.api(`/users/${roomEmail}/calendar`)
+      ?.api(`/users/${roomEmail}/calendar/events`)
       .header("Prefer", 'outlook.timezone="Central Europe Standard Time"')
       .get();
-    res.status(200).json(calendar);
+    res.status(200).json(calendar.value);
   } catch (err: any) {
     console.log(`Error getting events: ${err}`);
     res.status(500).json({ statusCode: 500, message: err.message });

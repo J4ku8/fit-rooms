@@ -7,7 +7,8 @@ export const useGetCalendar = ({ roomEmail }: GraphApiFetch) => {
     async () => {
       try {
         const response = await fetch(`/api/calendar?roomEmail=${roomEmail}`);
-        if (!response.ok) {
+
+          if (!response.ok) {
           return [];
         }
         return response.json();
@@ -15,6 +16,6 @@ export const useGetCalendar = ({ roomEmail }: GraphApiFetch) => {
         throw new Error(`Error occured in events fetching: ${error}`);
       }
     },
-    { refetchInterval: 5000 },
+    { refetchInterval: 120000 },
   );
 };
