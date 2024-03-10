@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Divider, Typography, useTheme} from "@mui/material";
 import {useGlobalContext} from "../../context/GlobalContext";
 import QRCode from "react-qr-code";
@@ -6,16 +6,21 @@ import {useGetEvents} from "../../queries/useGetEvents";
 import {formatDate, getCurrentDate, isRunningEvent} from "../../utils/time-helper";
 import Timer from "../Timer";
 import EventList from "../Event/EventList";
-import {useGetCalendar} from "../../queries/useGetCalendar";
 import {DisplayRoom} from "../../types";
 
 const style = {height: "25%", borderRadius: "10px 10px 0 0"}
 const Room = ({roomEmail, name}: DisplayRoom) => {
     const {color, setRoomStatus, isRoomFree} = useGlobalContext()
     const {data} = useGetEvents({roomEmail})
-    const styles = {backgroundColor: color, ...{style}}
-    const currentEvents = data?.filter((event: any) => event.isAllDay || isRunningEvent(new Date(event.start.dateTime), new Date(event.end.dateTime)))
+    const [roomCalendarUrl, setRoomCalendarUrl] = useState("")
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setRoomCalendarUrl(`${window.location.host}/calendar/${name}`)
+        }
+    }, []);
+
+    const currentEvents = data?.filter((event: any) => event.isAllDay || isRunningEvent(new Date(event.start.dateTime), new Date(event.end.dateTime)))
     const currentEvent = currentEvents?.length ? currentEvents[0] : null
     const upcomingEvents = data?.filter((event: any) => {
         if (currentEvent && event.id === currentEvent.id) {
@@ -28,13 +33,11 @@ const Room = ({roomEmail, name}: DisplayRoom) => {
         }
         return event
     })
-
-
     useEffect(() => {
         setRoomStatus(!currentEvent)
     }, [currentEvent, upcomingEvents]);
     const numberOfRunningEvents = currentEvents?.length
-
+    const styles = {backgroundColor: color, ...{style}}
     return (
         <Box height="90vh" display="flex" flexDirection="column">
             <Box p={2} style={styles} display="flex" alignItems="center" flexDirection="row"
@@ -51,7 +54,7 @@ const Room = ({roomEmail, name}: DisplayRoom) => {
                             <Typography
                                 variant="h6">{`Organiser: ${currentEvent?.organizer.emailAddress.address}`}</Typography>
                         </Box> : <br/>}
-                        <QRCode value={`https://timetable.fit.cvut.cz/new/rooms/${name}`} size={192}/>
+                        <QRCode value={roomCalendarUrl} size={192}/>
                     </Box>
                     <Box py={1} display="flex" flexDirection="column" gap={1.5}>
                         {numberOfRunningEvents ? <Typography

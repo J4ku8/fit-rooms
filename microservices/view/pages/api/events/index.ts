@@ -13,9 +13,10 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
     const roomEmail = _req.query.roomEmail;
     const queryDate = _req.query?.date;
+    const dateForPrer = queryDate !== "undefined" && queryDate ? queryDate.toString() : null
     const microsoftAuth = new GraphApiClient(settings);
     const client = microsoftAuth.initializeGraphForAppOnlyAuth();
-    const date = formatDateForApi(queryDate?.toString());
+    const date = formatDateForApi(dateForPrer);
     const events = await client
       ?.api(
         `/users/${roomEmail}/calendarView?startDateTime=${date}T00:00:00&endDateTime=${date}T23:59:59`,
