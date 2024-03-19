@@ -3,7 +3,7 @@ import path from 'path';
 import * as process from 'process';
 
 dotenv.config({
-  path: path.resolve(__dirname, '../../.env.dev'),
+  path: path.resolve(__dirname, '../../.env'),
 });
 
 const config = {

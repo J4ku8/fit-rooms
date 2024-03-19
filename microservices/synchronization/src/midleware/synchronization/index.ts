@@ -351,6 +351,7 @@ export const syncEvents = async (
           eventName: conflict?.subject,
           start: conflict?.start,
           end: conflict?.end,
+          room: room
         });
       }
     );
