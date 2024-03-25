@@ -8,7 +8,7 @@ export const useGetCalendar = ({ roomEmail }: GraphApiFetch) => {
       try {
         const response = await fetch(`/api/calendar?roomEmail=${roomEmail}`);
 
-          if (!response.ok) {
+        if (!response.ok) {
           return [];
         }
         return response.json();

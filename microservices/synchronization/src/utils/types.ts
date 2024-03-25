@@ -114,6 +114,12 @@ export type Event = {
     dateTime: string;
     timeZone: string;
   };
+  organizer: {
+    emailAddress: {
+      address: string;
+      name: string;
+    };
+  }
   recurrence: Recurrence;
   attendees: Array<Attendee>;
 };

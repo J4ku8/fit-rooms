@@ -24,6 +24,7 @@ class CvutApiHandler {
       },
     };
     const response = await axios.get(query, config);
+
     if (query.includes(KosApiRoutes.SEMESTER)) {
       const semesterName = await axios.get(`${query}/current`, config);
       const semesterInfo = await axios.get(

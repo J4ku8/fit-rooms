@@ -32,14 +32,13 @@ export class TokenManager {
     }
   }
 
-  scheduleTokenRefresh() {
+  async scheduleTokenRefresh() {
     setTimeout(() => {
       console.log('Token expiroval. Probíhá obnovení...');
       this.requestNewToken();
     }, this.expiresIn * 1000);
   }
 
-  // @ts-ignore
   async getAccessToken() {
     if (!this.accessToken || this.expiresIn < 60) {
       console.log('Token není platný nebo brzy expiruje. Probíhá obnovení...');

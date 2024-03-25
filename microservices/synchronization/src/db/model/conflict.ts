@@ -15,6 +15,14 @@ const conflictSchema = new Schema({
   },
   start: dateSchema,
   end: dateSchema,
+  kosEventOrganiser: {
+    type: String,
+    required: false,
+  },
+  msEventOrganiser: {
+    type: String,
+    required: false,
+  },
 });
 
 const Conflict = mongoose.model('Conflict', conflictSchema);

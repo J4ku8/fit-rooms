@@ -16,3 +16,6 @@ services:
     container_name: fit-rooms-view
     ports:
       - '4041:4041'
+
+
+

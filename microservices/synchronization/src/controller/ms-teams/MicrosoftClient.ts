@@ -12,7 +12,6 @@ const settings: AppSettings = {
 const microsoftAuth = new MicrosoftAuth(settings);
 
 class MicrosoftClient {
-  // @ts-ignore
   public client: Client;
   constructor() {
     this.client = microsoftAuth.initializeGraphForAppOnlyAuth();
@@ -22,23 +21,25 @@ class MicrosoftClient {
       const rooms = await this.client
         .api('/places/microsoft.graph.room')
         .select(['displayName', 'id', 'emailAddress'])
-        .top(25)
         .orderby('displayName')
         .get();
+
       // @ts-ignore
       return rooms.value.map(({ id, ...rest }) => ({ roomId: id, ...rest }));
     } catch (err) {
-      console.log(`Error getting users: ${err}`);
+      console.log(`Error getting listRooms: ${err}`);
     }
   }
+
   public async roomEvents(roomEmail: string): Promise<any> {
     try {
       const events = await this.client
         .api(`/users/${roomEmail}/calendar/events`)
         .get();
+
       return events.value;
     } catch (err) {
-      console.log(`Error getting users: ${err}`);
+      console.log(`Error getting roomEvents: ${err}`);
     }
   }
 
@@ -49,15 +50,11 @@ class MicrosoftClient {
     roomEmail: string;
     event: any;
   }): Promise<void> {
-    const res = await this.client
-      .api(`/users/${roomEmail}/calendar/events`)
-      .post(event);
-    return res;
+    await this.client.api(`/users/${roomEmail}/calendar/events`).post(event);
   }
 
   public async sendEmail({
     roomId,
-    recipient,
     content,
   }: {
     roomId: string;
@@ -74,7 +71,7 @@ class MicrosoftClient {
         toRecipients: [
           {
             emailAddress: {
-              address: recipient,
+              address: roomId,
             },
           },
         ],
@@ -82,7 +79,8 @@ class MicrosoftClient {
       saveToSentItems: 'false',
     };
     console.log('sending...');
-    return await this.client.api(`/users/${roomId}/sendMail`).post(email);
+
+    await this.client.api(`/users/${roomId}/sendMail`).post(email);
   }
 }
 export default MicrosoftClient;

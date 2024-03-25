@@ -12,10 +12,9 @@ const kosSync = (
   kosClient: KosApiClient,
 ) =>
   cron.schedule(
-    '*/30 * * * *',
+    '*/10 * * * *',
     async () => {
-      syncEvents(kosClient, graphClient);
-      console.log(currentTime(), 'Tato funkce se spustí každou půl hodinu');
+      await syncEvents(kosClient, graphClient);
     },
     {
       scheduled: true,
@@ -27,7 +26,7 @@ const semesterTask = (kos_client: KosApiClient) =>
   cron.schedule(
     '0 3 * * *',
     async () => {
-      return await kos_client.getSemester();
+      await kos_client.getSemester();
     },
     {
       scheduled: true,
@@ -44,12 +43,12 @@ export const writeRooms = async (client: MicrosoftClient) => {
             upsert: true,
         },
     }));
-
     Room.bulkWrite(bulkOps)
         .then((result: any) => console.log(result))
         .catch((error: any) =>
             console.error('Error at writing record to DB:', error)
         );
+    console.log("Rooms updated at: ", currentTime());
 }
 
 const roomSync = (client: MicrosoftClient) =>
@@ -68,7 +67,6 @@ const initCrons = async (
   kos_client: KosApiClient,
   graphClient: MicrosoftClient
 ) => {
-  let semester = await kos_client.getSemester();
   kosSync(graphClient, kos_client).start();
   semesterTask(kos_client).start();
   roomSync(graphClient).start();
