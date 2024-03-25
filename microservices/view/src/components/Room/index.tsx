@@ -44,10 +44,6 @@ const Room = ({roomEmail, name}: DisplayRoom) => {
                 <Box p={3} display="flex" width="66%" flexDirection="row" justifyContent="space-between">
                     <Box display="flex" flexDirection="column" gap={2}>
                         <Typography variant="h3">{name}</Typography>
-                        {!!currentEvent ? <Box display="flex" flexDirection="row" justifyContent="space-between">
-                            <Typography
-                                variant="h6">{`Organiser: ${currentEvent?.organizer.emailAddress.address}`}</Typography>
-                        </Box> : <br/>}
                         <Box display="flex" flexDirection="column" gap={0}>
                             <Typography variant="subtitle1">{"Calendar:"}</Typography>
                             <QRCode value={roomCalendarUrl} size={192}/>

@@ -10,7 +10,6 @@ import Room from '../../db/model/room';
 import { Event as EventType } from '../../utils/types';
 import moment from 'moment/moment';
 import MicrosoftClient from '../../controller/ms-teams/MicrosoftClient';
-import event from '../../db/model/event';
 import Conflict from '../../db/model/conflict';
 import { KosApiClient } from '../../controller/cvut-kos/KosClient';
 
