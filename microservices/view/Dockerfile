@@ -12,3 +12,9 @@ ENV NODE_ENV=dev
 ENV PORT=4041
 
 CMD ["yarn", "run","dev"]
+
+
+
+
+
+

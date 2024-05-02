@@ -1,16 +1,16 @@
-import React from 'react'
-import Link from 'next/link'
+import React from "react";
+import Link from "next/link";
 
-import { Room } from '../../types'
+import { Room } from "../../types";
 
 type Props = {
-  data: Room
-}
+  data: Room;
+};
 
 const RoomListItem = ({ data }: Props) => (
-  <Link href="/rooms/[id]" as={`/rooms/${data.displayName}`}>
+  <Link href="/room/[id]" as={`/room/${data.displayName}`}>
     {data.displayName}
   </Link>
-)
+);
 
-export default RoomListItem
+export default RoomListItem;

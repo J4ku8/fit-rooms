@@ -5,7 +5,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc",
-    "format": "prettier --write './**/*.ts'"
+    "format": "prettier --write './'"
   },
   "dependencies": {
     "@azure/identity": "^4.0.1",

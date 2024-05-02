@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es2019",
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "baseUrl": "./"
-  }
-
+    "baseUrl": "./",
+  },
+  "include": [
+    "types"
+  ]
 }

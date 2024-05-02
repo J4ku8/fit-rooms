@@ -18,7 +18,7 @@ const removeAtom = (obj: AtomlessObject) => {
   }
   return newObj;
 };
-const removeAtomPrefix = (arr: AtomlessObject[] | AtomlessObject): any => {
+const removeAtomPrefix = (arr: AtomlessObject[]): any => {
   if (Array.isArray(arr)) {
     return arr?.map((obj) => removeAtom(obj));
   } else {
@@ -44,8 +44,9 @@ const xmlParser = async (xmlData: string): Promise<AtomlessObject[]> => {
         }
       });
     });
+
     if (result['atom:entry']) {
-      return [removeAtomPrefix(result['atom:entry']).content];
+      return removeAtomPrefix(result['atom:entry']).content;
     } else {
       return removeAtomPrefix(result['atom:feed']['atom:entry']);
     }

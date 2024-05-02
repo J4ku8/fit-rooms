@@ -6,7 +6,9 @@ export const useGetEvents = ({ roomEmail, date }: GraphApiFetch) => {
     ["events", roomEmail],
     async () => {
       try {
-        const response = await fetch(`/api/events?roomEmail=${roomEmail}&date=${date}`);
+        const response = await fetch(
+          `/api/events?roomEmail=${roomEmail}&date=${date}`,
+        );
         if (!response.ok) {
           return [];
         }

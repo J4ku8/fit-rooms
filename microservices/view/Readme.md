@@ -2,7 +2,7 @@
 
 This service is view part of diploma work.
 
-Before you start, make sure that MongoDB is running.  
+Before you start, make sure that MongoDB is running.
 
 For local development run: `yarn install & yarn run dev`
 

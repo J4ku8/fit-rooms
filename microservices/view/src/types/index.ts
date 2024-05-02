@@ -10,13 +10,13 @@ export type Event = {
   room: string;
   name: string;
   organiser: string;
-  start:{
+  start: {
     dateTime: string;
-    timeZone: string
+    timeZone: string;
   };
-  end:{
+  end: {
     dateTime: string;
-    timeZone: string
+    timeZone: string;
   };
   subject: string;
   recurrence: any;
@@ -31,13 +31,13 @@ export type Room = {
 export type DisplayRoom = {
   roomEmail: string;
   name: string;
-}
+};
 
 export type ProvidersProps = {
   children: ReactNode;
   title?: string;
   transparentFooter?: boolean;
-  isMobile?: boolean
+  isMobile?: boolean;
 };
 
 export type AppSettings = {

@@ -10,7 +10,6 @@ import Room from '../../db/model/room';
 import { Event as EventType } from '../../utils/types';
 import moment from 'moment/moment';
 import MicrosoftClient from '../../controller/ms-teams/MicrosoftClient';
-import event from '../../db/model/event';
 import Conflict from '../../db/model/conflict';
 import { KosApiClient } from '../../controller/cvut-kos/KosClient';
 
@@ -42,6 +41,7 @@ const createParallelEvent = async (
       contentType: 'HTML',
       content: parallel.course['_'],
     },
+    bodyPreview: "KOS – parallel",
     start: {
       dateTime: assignTimeToDate(startDay, startTime).toISOString(),
       timeZone: 'Central Europe Standard Time',
@@ -89,6 +89,7 @@ const createExamEvent = async (exam: any) => {
           contentType: 'HTML',
           content: course['_'],
         },
+        bodyPreview: "KOS – exam",
         location: {
           displayName: roomName,
         },
@@ -128,6 +129,7 @@ const createCourseEvent = async (event: any) => {
           contentType: 'HTML',
           content: title,
         },
+        bodyPreview: "KOS – course event",
         location: {
           displayName: roomName,
         },
@@ -161,35 +163,37 @@ export const parseParrallels = async ({
   semesterEnd: Date;
   data: any;
 }) => {
-  // @ts-ignore
   const result =
-    (await Promise.all(
+      await Promise?.all(
       data?.map((parallel: any) =>
         createParallelEvent(parallel, semesterStart, semesterEnd)
       )
-    )) || [];
+    ) || [];
   return result?.filter((value) => value !== null);
 };
 
 export const parseExams = async (data: any) => {
-  // @ts-ignore
-  const result = await Promise.all(data?.map((exam) => createExamEvent(exam)));
+  const result = await Promise?.all(
+    data?.map((exam: any) => createExamEvent(exam))
+  );
   return result?.filter((value) => value !== null);
 };
 
 export const parseCourseEvents = async (data: any) => {
-  // @ts-ignore
   const result =
-    (await Promise.all(data?.map((event: any) => createCourseEvent(event)))) || [];
+    (await Promise.all(data?.map((event: any) => createCourseEvent(event)))) ||
+    [];
   return result?.filter((value) => value !== null);
 };
 
 const getIsSameDay = (newEvent: EventType, existingEvent: EventType) => {
   if (newEvent?.recurrence) {
     return newEvent?.recurrence?.pattern?.daysOfWeek.some((day) => {
-      const dayLowerCase = day.toLowerCase()
+      const dayLowerCase = day.toLowerCase();
       if (existingEvent?.recurrence) {
-        return existingEvent?.recurrence?.pattern?.daysOfWeek?.includes(dayLowerCase);
+        return existingEvent?.recurrence?.pattern?.daysOfWeek?.includes(
+          dayLowerCase
+        );
       }
       const date = moment(newEvent?.start?.dateTime);
       const dayName =
@@ -200,9 +204,11 @@ const getIsSameDay = (newEvent: EventType, existingEvent: EventType) => {
   }
   if (existingEvent?.recurrence) {
     return existingEvent?.recurrence?.pattern?.daysOfWeek.some((day) => {
-      const dayLowerCase = day.toLowerCase()
+      const dayLowerCase = day.toLowerCase();
       if (newEvent?.recurrence) {
-        return newEvent?.recurrence?.pattern?.daysOfWeek?.includes(dayLowerCase);
+        return newEvent?.recurrence?.pattern?.daysOfWeek?.includes(
+          dayLowerCase
+        );
       }
       const date = moment(existingEvent?.start?.dateTime);
       const dayName =
@@ -222,15 +228,17 @@ const getIsSameDay = (newEvent: EventType, existingEvent: EventType) => {
   return existingDayName === newDayName;
 };
 
-export const getEvents = async (
+export const getSortedEvents = async (
   events: EventType[],
   microsoft_client: MicrosoftClient
 ) => {
   const conflictedEvents: EventType[][] = [];
+  const duplicatedEvents: EventType[][] = [];
   const newEventsPromises: Promise<EventType | undefined>[] = events.map(
     async (event: EventType) => {
       const eventRoom = event.attendees[0].emailAddress.address;
-      const createdEvents: EventType[] = await microsoft_client.roomEvents(eventRoom);
+      const createdEvents: EventType[] =
+        await microsoft_client.roomEvents(eventRoom);
       const conflicts = createdEvents?.filter((existingEvent: EventType) => {
         const startTimeExisting = moment(
           moment(existingEvent?.start?.dateTime).format('HH:mm:ss'),
@@ -252,7 +260,6 @@ export const getEvents = async (
         const isSameRoom = existingEvent.attendees.some(
           (attendee) => attendee.emailAddress.address === eventRoom
         );
-
         return (
           isSameRoom &&
           isSameDay &&
@@ -265,7 +272,10 @@ export const getEvents = async (
         );
       });
       conflictedEvents.push(conflicts);
-      if (!conflicts.length) {
+      const isConflcitedEvent = conflicts.some(
+        (conflitEvent) => conflitEvent.subject === event.subject
+      );
+      if (!isConflcitedEvent) {
         return event;
       }
       return;
@@ -283,11 +293,9 @@ export const syncEvents = async (
   microsoft_client: MicrosoftClient
 ) => {
   const semester = await kos_client.getSemester();
-
-  const courseEvents = await kos_client.getCourseEvent(semester.name);
-  const exams = await kos_client.getExams(semester.name);
-  const parallels = await kos_client.getParallels(semester?.name);
-
+  const courseEvents: any[] = await kos_client.getCourseEvent(semester.name) || [];
+  const exams: any[] = await kos_client.getExams(semester.name) || [];
+  const parallels: any[] = await kos_client.getParallels(semester?.name) || [];
   const endOfLectures = new Date(
     new Date(semester.from).setDate(
       semester.from.getDate() + WEEKS_OF_LECTURES * 7 + 5
@@ -305,11 +313,16 @@ export const syncEvents = async (
     ...microsoftExams,
     ...microsoftCourseEvents,
   ];
-  const { conflictedEvents, newEvents } = await getEvents(
+  const allKosEvents: any = [
+    ...parallels,
+    ...exams,
+    ...courseEvents,
+  ];
+
+  const { conflictedEvents, newEvents } = await getSortedEvents(
     allEvents,
     microsoft_client
   );
-
 
   try {
     const eventPromises = newEvents
@@ -324,41 +337,46 @@ export const syncEvents = async (
         });
       });
 
-    const conflictPromises = conflictedEvents.flat()?.map(
-      async (conflict: EventType) => {
+    const conflictPromises = conflictedEvents
+      .flat()
+      ?.map(async (conflict: EventType) => {
         const room = await Room.findOne({
           displayName: conflict?.location?.displayName,
         });
+        const authorKos = allKosEvents.find((event: any )=> event?.course["_"] === conflictedEvents[0][0].subject)?.author.name
+        const authorKosEmail = `${authorKos}@fit.cvut.cz`
+        const authorMS = conflict?.organizer.emailAddress.address;
         const prevConflict = await Conflict.findOne({
           eventName: conflict?.subject,
           start: conflict?.start,
           end: conflict?.end,
+          kosEventOrganiser: authorKosEmail,
+          msEventOrganiser: authorMS,
         });
 
 
         if (room && !prevConflict) {
-          // TODO: validate send email
-          console.log("send email")
-
-          // return await microsoft_client.sendEmail({
-          //   roomId: room?.roomId,
-          //   recipient: 'tichyj15@x2h3h.onmicrosoft.com',
-          //   content: `There is a conflict between existing event ${conflict.subject} at ${conflict?.start?.dateTime} and new incoming from KOS ${conflict.subject} at ${conflict?.start?.dateTime}`,
-          // });
+          await microsoft_client.sendEmail({
+            roomId: room?.roomId,
+            content: `There is a conflict between existing event ${conflict.subject} at ${conflict?.start?.dateTime}
+            and new incoming from KOS ${conflict.subject} at ${conflict?.start?.dateTime}. \n Kos contact person:${authorKosEmail}. \n MS contact person:${authorMS}`,
+          });
         }
 
         await Conflict.create({
           eventName: conflict?.subject,
           start: conflict?.start,
           end: conflict?.end,
-          room: room
+          room: room,
+          kosEventOrganiser: authorKosEmail,
+          msEventOrganiser: authorMS,
         });
-      }
-    );
+      });
 
     const res = await Promise.all([eventPromises, conflictPromises]);
-    console.log("Write done!")
-  } catch (e) {
+    console.log('Write done!');
+  } catch (e: any) {
     console.log(e);
+    throw new Error(e);
   }
 };

@@ -1,11 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import {
-  isToday,
-  thisMonthRange,
-  todayDate,
-} from "../../../src/utils/time-helper";
 import GraphApiClient from "../../../model/GraphApiClient";
-import { AppSettings, PatternTypes } from "../../../src/types";
+import { AppSettings } from "../../../src/types";
 
 const settings: AppSettings = {
   clientSecret: process.env.CLIENT_SECRET_MS || "",

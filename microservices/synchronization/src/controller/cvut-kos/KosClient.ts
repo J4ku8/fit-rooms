@@ -1,22 +1,21 @@
-import { ApiProviders, KosApiRoutes, SemesterSchema } from '../../utils/types';
+import {ApiProviders, KosApiRoutes, SemesterSchema} from '../../utils/types';
 import CvutApiHandler from './CvutApiHandler';
-import { LIMIT } from '../../utils/constants';
+import {LIMIT} from '../../utils/constants';
 import Semester from '../../db/model/semester';
 import Room from '../../db/model/room';
-import {EventType} from "@microsoft/microsoft-graph-types";
 
 export class KosApiClient extends CvutApiHandler {
   private _filterEventsByRooms = async (events: any) => {
     const rooms = await Room.find({});
-    // @ts-ignore
     return events?.filter(
       (event: any) =>
         event?.content?.room &&
         rooms.some(
-          (room) =>
-            room.displayName === event?.content?.room['_'] ||
-            (event?.content?.note &&
-              room.displayName === event?.content?.note['_'])
+          (room: any) => {
+            return room.displayName === event?.content?.room['_'] ||
+                (event?.content?.note &&
+                    room.displayName === event?.content?.note['_']);
+          }
         )
     );
   };
@@ -27,7 +26,7 @@ export class KosApiClient extends CvutApiHandler {
       console.log(e);
     }
   };
-  public getAvailableRooms = async () => {
+  getAvailableRooms = async () => {
     try {
       return await Room.find({});
     } catch (error: any) {
@@ -49,15 +48,15 @@ export class KosApiClient extends CvutApiHandler {
       if (storedSemester) {
         return storedSemester;
       } else {
-        const data = await this.handleApiCall({
+        const data: any = await this.handleApiCall({
           query: `${ApiProviders.KOS_API}${KosApiRoutes.SEMESTER}`,
         });
-        const semester = data[0];
-        const newSemester = new Semester({
-          name: semester.code,
-          from: new Date(String(semester.startDate)),
-          to: new Date(String(semester.endDate)),
-        });
+        const semesterJSON = {
+          name: data.code,
+          from: new Date(String(data.startDate)),
+          to: new Date(String(data.endDate)),
+        }
+        const newSemester = new Semester(semesterJSON);
         Semester.updateOne(
           { name: newSemester.name },
           {
@@ -65,14 +64,14 @@ export class KosApiClient extends CvutApiHandler {
           },
           { upsert: true }
         )
-          .then((result) => {
+          .then((result: any) => {
             if (result.upsertedId) {
               console.log('Záznam byl vložen:', result.upsertedId);
             } else {
               console.log('Záznam již existuje:', newSemester.name);
             }
           })
-          .catch((error) => {
+          .catch((error: any) => {
             console.error('Chyba při vkládání záznamu:', error);
           });
         return newSemester;
@@ -88,14 +87,28 @@ export class KosApiClient extends CvutApiHandler {
   getParallels = async (semester: string) => {
     try {
       const rooms = await this.getAvailableRooms();
-      const queryString = rooms
-        ?.map((room) => room.displayName)
-        .map((roomName) => `timetableSlot/room.code==${roomName}`)
+      const queryString = rooms?.filter((room: any) => {
+        const roomName = room.displayName as string;
+        return !roomName.toLowerCase().includes("test") && room
+      })
+          ?.map((room: any) => room.displayName)
+        .map((roomName: string) => `timetableSlot/room.code==${roomName}`)
         .join(',');
+
+
       const res = await this.handleApiCall({
-        query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?includeInvalidSlots=false&limit=${LIMIT}&offset=0&query=semester==${semester} and (${queryString})`,
+        query: `${ApiProviders.KOS_API}${KosApiRoutes.PARALLELS}?offset=0&limit=${LIMIT}&query=semester==${semester} and (${queryString})`,
       });
-      return res?.map((parallel) => parallel?.content);
+
+      return res?.map((parallel) => {
+        const { content, author } = parallel || {};
+        const contentObject: any = content;
+        const authorObject: any = author;
+        return ({
+          ...contentObject,
+          author: {...authorObject}
+        });
+      });
     } catch (error: any) {
       // Handle errors
       console.error('Error making API call getParallels::', error?.message);
@@ -105,16 +118,18 @@ export class KosApiClient extends CvutApiHandler {
 
   getExams = async (semester: string) => {
     try {
-      const rooms = await this.getAvailableRooms();
-      const queryString = rooms
-        ?.map((room) => room.displayName)
-        .map((roomName) => `timetableSlot/room.code==${roomName}`)
-        .join(',');
-      //  and (${queryString})
-      const res = await this.handleApiCall({
+      const exams = await this.handleApiCall({
         query: `${ApiProviders.KOS_API}${KosApiRoutes.EXAMS}?limit=${LIMIT}&offset=0&query=semester==${semester}`,
       });
-      return res?.map((parallel) => parallel?.content);
+      return exams?.map((exam) => {
+        const { content, author } = exam || {};
+        const contentObject: any = content;
+        const authorObject: any = author;
+        return ({
+          ...contentObject,
+          author: {...authorObject}
+        });
+      });
     } catch (error: any) {
       // Handle errors
       console.error('Error making API call getExams::', error?.message);
@@ -124,10 +139,17 @@ export class KosApiClient extends CvutApiHandler {
 
   getCourseEvent = async (semester: string) => {
     try {
-      const dataset = await this.handleApiCall({
-        query: `${ApiProviders.KOS_API}${KosApiRoutes.COURSE_EVENT}?limit=1000&query=semester==${semester}`,
+      const courseEvents = await this.handleApiCall({
+        query: `${ApiProviders.KOS_API}${KosApiRoutes.COURSE_EVENT}?offset=0&limit=1000&query=semester==${semester}`,
       });
-      return await this._extractCourseEvents(dataset);
+      const filteredDCourseEvents = await this._extractCourseEvents(courseEvents)
+      return filteredDCourseEvents?.map((event: any) => {
+        const { content, author } = event || {};
+        return ({
+          ...content,
+          author: {...author}
+        });
+      });
     } catch (error: any) {
       // Handle errors
       console.error(

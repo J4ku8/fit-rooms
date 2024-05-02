@@ -6,7 +6,6 @@ import Providers from "../../src/components/Providers";
 import { getRooms } from "../../src/utils/db";
 import Room from "../../src/components/Room";
 import { sampleRoomsData } from "../../src/utils/sample-data";
-import Calendar from "../../src/components/Calendar";
 
 type Props = {
   item?: RoomType;
@@ -17,23 +16,17 @@ const StaticPropsDetail = ({ item, errors }: Props) => {
   if (errors) {
     return (
       <Layout title="Error | Next.js + TypeScript Example">
-        <p>
-          <Typography style={{ color: "red" }}>Error:</Typography> {errors}
-        </p>
+        <Typography style={{ color: "red" }}>Error:</Typography> {errors}
       </Layout>
     );
   }
 
   return (
-    <Providers
-      transparentFooter={true}
-      title={`${item ? item.displayName : "Room calendar"}`}
-      isMobile={true}
-    >
+    <Providers title={`${item ? item.displayName : "Room Detail"}`}>
       {item ? (
-        <Calendar roomEmail={item.emailAddress} name={item.displayName} />
+        <Room roomEmail={item.emailAddress} name={item.displayName} />
       ) : (
-        <Calendar roomEmail={""} name={"Room detail"} />
+        <Room roomEmail={""} name={"Room detail"} />
       )}
     </Providers>
   );
