@@ -45,10 +45,14 @@ const Room = ({ roomEmail, name }: DisplayRoom) => {
     return event;
   });
   useEffect(() => {
-    setRoomStatus(!currentEvent);
+    if(isRoomFree === !!currentEvent){
+      setRoomStatus(!currentEvent);
+    }
   }, [currentEvent, upcomingEvents]);
   const numberOfRunningEvents = currentEvents?.length;
   const styles = { backgroundColor: color, ...{ style } };
+
+  const showTimer = !!currentEvent || (isRoomFree && !!upcomingEvents?.length);
 
   return (
     <Box height="90vh" display="flex" flexDirection="column">
@@ -63,9 +67,10 @@ const Room = ({ roomEmail, name }: DisplayRoom) => {
         <Typography variant="h1" fontWeight="bold">
           {isRoomFree ? "Free" : "Busy"}
         </Typography>
-        {upcomingEvents?.length ? (
+        {showTimer ? (
           <Timer
-            event={isRoomFree ? upcomingEvents[0] : currentEvent || undefined}
+            event={isRoomFree && upcomingEvents?.length ? upcomingEvents[0] : currentEvent}
+            hasNextEvents={!!upcomingEvents?.length}
           />
         ) : null}
       </Box>
