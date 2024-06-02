@@ -17,6 +17,6 @@ export const useGetEvents = ({ roomEmail, date }: GraphApiFetch) => {
         throw new Error(`Error occured in events fetching: ${error}`);
       }
     },
-    { refetchInterval: 5000 },
+    { refetchInterval: 50000 },
   );
 };
